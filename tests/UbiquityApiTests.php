@@ -2,11 +2,7 @@
 
 namespace Wreda\Ubiquity\tests;
 
-use SilverStripe\CMS\Model\SiteTree;
-
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Dev\SapphireTest;
-use Ubiquity\Services\UbiquityService;
+use SapphireTest;
 
 class UbiquityApiTests extends SapphireTest
 {

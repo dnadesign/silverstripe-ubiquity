@@ -37,3 +37,7 @@ EditableOption:
 EditableMultipleOptionField:
   extensions:
     - UbiquityMultipleOptionExtension
+
+Page_Controller:
+  extensions:
+    - UbiquityPageControllerExtension

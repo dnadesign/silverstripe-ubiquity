@@ -4,6 +4,8 @@ class UbiquitySiteConfigExtension extends DataExtension
 {
     private static $db = array(
         'UbiquityEnabledSubsites' => 'Varchar(100)',
+        'EnableUbiquityAnalytics' => 'Boolean(1)',
+        'DebugUbiquityAnalytics'  => 'Boolean',
     );
 
     private static $has_many = array(
@@ -26,6 +28,14 @@ class UbiquitySiteConfigExtension extends DataExtension
                 HeaderField::create('Ubiquity databases for ' . $currentSubsiteName, 'Ubiquity databases for ' . $currentSubsiteName),
                 $gridfield,
             ]);
+
+            $fields->addFieldToTab('Root.Ubiquity', 
+                CheckboxField::create('EnableUbiquityAnalytics', 'Enable Ubiquity Analytics')
+            );
+
+            $fields->addFieldToTab('Root.Ubiquity', 
+                CheckboxField::create('DebugUbiquityAnalytics', 'Allow Ubiquity Analytics Data to be sent to from Staging.')
+            );
         }
 
         if (class_exists('Subsite')) {
