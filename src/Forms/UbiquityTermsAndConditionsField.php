@@ -1,6 +1,6 @@
 <?php
 
-class TermsAndConditionsField extends CheckboxField
+class UbiquityTermsAndConditionsField extends CheckboxField
 {
     protected $htmlLabel;
 

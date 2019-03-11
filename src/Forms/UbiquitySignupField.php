@@ -31,9 +31,9 @@ class UbiquitySignupField extends EditableCheckbox
 
     public function getFormField()
     {
-        $field = TermsAndConditionsField::create($this->Name, $this->EscapedTitle, $this->CheckedDefault, $this->HTMLLabel)
-            ->setFieldHolderTemplate('UserformsCheckboxField_holder')
-            ->setTemplate('TermsAndConditionsField')
+        $field = UbiquityTermsAndConditionsField::create($this->Name, $this->EscapedTitle, $this->CheckedDefault, $this->HTMLLabel)
+            ->setFieldHolderTemplate('UbiquityTermsAndConditionsField_holder')
+            ->setTemplate('UbiquityTermsAndConditionsField')
             ->addExtraClass('ubiquitysignup');
 
         $this->doUpdateFormField($field);
