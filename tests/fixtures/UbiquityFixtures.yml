@@ -1,0 +1,30 @@
+SilverStripe\SiteConfig\SiteConfig:
+  main:
+    UbiquityEnvironment: staging
+
+SilverStripe\Security\Member:
+  dev:
+    FirstName: dev
+    LastName: DNA
+    Email: dev@dna.co.nz
+
+Pages\CustomForm:
+  testform:
+    Title: Test Ubiquity
+    UbiquityDatabase: customer
+
+SilverStripe\UserForms\Model\EditableFormField\EditableTextField:
+  email:
+    Title: Email
+    UbiquityFieldID: Vs5Ejdt9GkiDIQjUFHekFw
+    Parent: =>CustomForm.testform
+  firstName:
+    Title: First Name
+    UbiquityFieldID: MivB3U8Jo0O34wjUFHdUvA
+    Parent: =>CustomForm.testform
+  lastName:
+    Title: Last Name
+    UbiquityFieldID: pFJxwOSmskGPlwjUFHddoQ
+    Parent: =>CustomForm.testform
+
+
