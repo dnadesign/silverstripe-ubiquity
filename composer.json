@@ -10,8 +10,7 @@
 	}],
 	"require": {
 		"silverstripe/framework": "~3.7",
-		"silverstripe/cms": "~3.7",
-		"silverstripe/userforms": "~4.6"
+		"silverstripe/cms": "~3.7"
 	},
     "require-dev": {
         "phpunit/PHPUnit": "~3.7@stable"
