@@ -1,14 +1,11 @@
 ---
 Name: appubiquityconfig
-Before:
-  - coreconfig
 ---
 
 UbiquityService:
   base_end_point: https://api.ubiquity.co.nz/
   analytics_keys:
-    - 4x87f2m1yzkml3vkx4nvt61yjp6pqcjt0lff6zjmf6gy9_264jv0
-    - 9pgcf4zzs3jr58ksydwv6zbq24zx67wxpq_6zw9zsqbl8x_m6zx0
+    - xxxxxxxx
 
 SiteConfig:
   extensions:
@@ -18,11 +15,7 @@ UserDefinedForm:
   extensions:
     - UbiquityFormsExtension
 
-UserDefinedFormController:
-  extensions:
-    - UbiquityFormControllerExtension
-
-CustomFormController:
+SubmittedForm:
   extensions:
     - UbiquityFormControllerExtension
 

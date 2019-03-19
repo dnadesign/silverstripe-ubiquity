@@ -2,11 +2,16 @@
 
 class UbiquityFormControllerExtension extends DataExtension
 {
-    public function onAfterProcess($data, $form, $controller)
+    public function updateAfterProcess()
     {
+
+        $data = $this->owner->Values()->map('Name', 'Value')->toArray();
+
         // Check if the form has a Ubiquity database set up.
-        $userForm = $this->owner->dataRecord;
+        $userForm = $this->owner->parent()->data();
+
         $databaseId = $userForm->UbiquityDatabase;
+
         if (!$databaseId) {
             return;
         }
@@ -22,7 +27,6 @@ class UbiquityFormControllerExtension extends DataExtension
         // we can use the Ubiquity Service
         $service = new UbiquityService();
         $service->setTargetDatabase($databaseId);
-
         // Figure out which field is the email
         $emailRefID = $service->getEmailFieldRefID();
         if (!$emailRefID) {
@@ -31,7 +35,8 @@ class UbiquityFormControllerExtension extends DataExtension
 
         // Check if we have a valid value for this field
         $ubiquityEmailFields = $ubiquityFields->filter('UbiquityFieldID', $emailRefID);
-        $ubiquityEmailField = $ubiquityEmailFields->First();
+        $ubiquityEmailField = $ubiquityEmailFields->first();
+
         if ($ubiquityEmailField && isset($data[$ubiquityEmailField->Name])) {
             $email = $data[$ubiquityEmailField->Name];
             if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
@@ -61,6 +66,7 @@ class UbiquityFormControllerExtension extends DataExtension
         // If this field is included in the form, the form processor will need to determine if the field is checked.
         // if not included in the form, data is sent to ubiquity (but only if there are ubiquity fields)
         $signupField = $userForm->Fields()->filter('ClassName', 'UbiquitySignupField')->first();
+
         if ($signupField && $signupField->exists()) {
             // if Checked, data will be submitted as normal (but only if there are ubiquity fields)
             $checked = isset($data[$signupField->Name]) ? $data[$signupField->Name] : false;
