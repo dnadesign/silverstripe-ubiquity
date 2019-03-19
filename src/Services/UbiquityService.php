@@ -246,8 +246,6 @@ class UbiquityService
                     return $returnedData['referenceID'];
                 }
             } catch (Exception $e) {
-                echo $e->getMessage();
-                exit;
                 // Handle API error
                 $this->exitWithError($e);
             }
