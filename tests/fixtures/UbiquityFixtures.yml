@@ -1,30 +1,29 @@
-SilverStripe\SiteConfig\SiteConfig:
+SiteConfig:
   main:
     UbiquityEnvironment: staging
 
-SilverStripe\Security\Member:
+UbiquityDatabase:
+  database:
+    Environment: staging
+    Title: lorem
+    ID: 1
+    APIKey: vTOcfExyXSK8zpC9eRF060UosJZy-hkZShFz9jRkG0cJjwD3yBZjS3ElcTn5Dj_coT0nNlqtnoustyeLlYzq-GbQacqOBHbiFxD6dvA4-tI4vttT1gJqdA6HJsfcrJWJug9V4M_5ajo
+
+Member:
   dev:
-    FirstName: dev
-    LastName: DNA
+    FirstName: DNA
+    LastName: Dev
     Email: dev@dna.co.nz
 
-Pages\CustomForm:
+UserDefinedForm:
   testform:
-    Title: Test Ubiquity
-    UbiquityDatabase: customer
+    Title: Ubiquity Test
+    UbiquityDatabase: 3
 
-SilverStripe\UserForms\Model\EditableFormField\EditableTextField:
+EditableTextField:
   email:
     Title: Email
-    UbiquityFieldID: Vs5Ejdt9GkiDIQjUFHekFw
-    Parent: =>CustomForm.testform
-  firstName:
-    Title: First Name
-    UbiquityFieldID: MivB3U8Jo0O34wjUFHdUvA
-    Parent: =>CustomForm.testform
-  lastName:
-    Title: Last Name
-    UbiquityFieldID: pFJxwOSmskGPlwjUFHddoQ
-    Parent: =>CustomForm.testform
+    UbiquityFieldID: CvY5o-IIq0yc7gjWqGO2-Q
+    Parent: =>UserDefinedForm.testform
 
 

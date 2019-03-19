@@ -1,42 +1,71 @@
 <?php
 
-class UbiquityService extends RestfulService
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+
+class UbiquityService
 {
     protected $targetDatabase;
 
     protected $targetEnvironment;
 
-    public function setDefaultClientOptions()
-    {
-        parent::setDefaultClientOptions();
-        $options = array(
-            'base_uri' => Config::inst()->get('UbiquityService', 'base_end_point'),
-            'headers' => array(
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ),
-        );
+    /**
+     * @var Client
+     */
+    protected $client;
 
-        $this->addClientOptions($options);
+    public function __construct() 
+    {
+        $this->client = new Client(
+            array(
+                'base_uri' => Config::inst()->get('UbiquityService', 'base_end_point'),
+                'headers' => array(
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ),
+                'query' => array(
+                    'apiToken' => ''
+                ),
+                // 'on_stats' => function (GuzzleHttp\TransferStats $stats) {
+                //     //                echo sprintf("URL: %s\r\n", $stats->getEffectiveUri());
+                //     echo sprintf("Response time: %s\r\n", $stats->getTransferTime());
+                    
+                //     if($stats->hasResponse()) {
+                //         echo sprintf("Response status: %s\r\n", $stats->getResponse()->getStatusCode());
+                //     } else {
+                //         var_dump($stats->getHandlerErrorData());
+                //         exit;
+                //     }
+                // }
+            )
+        );
     }
 
-    /**
-     * Call the remote API and return the response
-     *
-     * @param  array  $requestOptions Further options
-     * to add to the request
-     * @return GuzzleHttp\Psr7\Response
-     */
-    public function call($method = 'GET')
-    {
-        try {
-            $client = new Client($this->clientOptions);
-            $result = $client->request($method, $this->uri, $this->requestOptions);
-        } catch (ClientException $e) {
-            $this->exitWithError($e);
+    public function processData($dataList) {
+        $result = [];
+
+        foreach ($dataList as $data) {
+            array_push(
+                $result,
+                [
+                    'fieldID' => $data['fieldID'],
+                    'value'   => $data['value']
+                ]
+            );
         }
 
         return $result;
+    }
+
+    /**
+     * Update a single query option within request options
+     *
+     * @param  String $k Key to change/add
+     * @param  Mixed $v Value to set
+     */
+    public function updateQueryOption($k, $v)
+    {
+        $this->client->requestOptions['query'][$k] = $v;
     }
 
     /**
@@ -110,7 +139,7 @@ class UbiquityService extends RestfulService
         $env = (singleton('Director')->isLive()) ? 'production' : 'staging';
         $database = UbiquityDatabase::get()->byID($databaseId);
 
-        if ($database && $database->Exists()) {
+        if ($database && $database->exists()) {
             $name = $database->Title;
             $token = $database->APIKey;
             if ($token) {
@@ -119,7 +148,7 @@ class UbiquityService extends RestfulService
                 $this->updateQueryOption('format', 'json');
                 return $this->targetDatabase;
             } else {
-                user_error('api_key is not set for databse ' . $name . '!', E_USER_ERROR);
+                user_error('api_key is not set for database ' . $name . '!', E_USER_ERROR);
             }
         } else {
             user_error("Unknown database with ID $databaseId", E_USER_ERROR);
@@ -154,10 +183,12 @@ class UbiquityService extends RestfulService
             user_error('No target database is set!', E_USER_ERROR);
         }
 
-        $this->setUri('database/fields');
-
         try {
-            $response = $this->call();
+            $response = $this->client->get('database/fields', [
+                'query' => [
+                    'apiToken' => $this->targetDatabase['Token']
+                ]
+            ]);
         } catch (Exception $e) {
             $this->exitWithError($e);
         }
@@ -177,19 +208,19 @@ class UbiquityService extends RestfulService
         $fields = $this->getDatabaseFields();
         if ($fields && is_array($fields)) {
             $list = ArrayList::create($fields);
-            $emailField = $list->filter(array("type" => 'Email', "isNullable" => false))->First();
-
+            $emailField = $list->filter(array("type" => 'Email', "isNullable" => true))->First();
             if ($emailField && !empty($emailField) && isset($emailField['fieldID'])) {
                 return $emailField['fieldID'];
             }
         }
-
         return false;
     }
 
     // Post data
     public function post($fields, $emailField)
     {
+        $client = new Client();
+
         if (!$this->hasTargetDatabase()) {
             user_error('No target database is set!', E_USER_ERROR);
         }
@@ -202,32 +233,38 @@ class UbiquityService extends RestfulService
         // Check if contact already exists
         $existingRef = $this->getExistingContact($emailField);
         $existingRefID = $existingRef['referenceID'];
-
         // If contact doesn't already exists
         // create it with PUT
+
+        $fields = array_filter($fields);
+
+        $data = [
+            'query' => [
+                'format' => 'json',
+                'apiToken' => $this->targetDatabase['Token'],
+            ],
+            'json' => [
+                'data' => $fields
+            ]
+        ];
+
         if (!$existingRefID) {
-            $this->setUri('database/contacts');
-
-            $data = array('data' => $fields);
-            $this->addClientOption('body', json_encode($data));
-
             try {
-                $response = $this->call('POST');
-
+                $response = $this->client->post('database/contacts', $data);
                 // Return the reference ID of the newly created entry
                 $returnedData = $this->parseBody($response->getBody());
                 if (isset($returnedData['referenceID'])) {
                     return $returnedData['referenceID'];
                 }
             } catch (Exception $e) {
+                echo $e->getMessage();
+                exit;
                 // Handle API error
                 $this->exitWithError($e);
             }
-
             return false;
         } else {
             // Otherwise, update it with UPDATE
-            $this->setUri('database/contacts/' . $existingRefID);
             // In the case of an update, make sure we update only the fields
             // that are empty on Ubiquity
             // or have the AllowOverride option checked
@@ -238,11 +275,8 @@ class UbiquityService extends RestfulService
                 return true;
             }
 
-            $data = array('data' => $fields);
-            $this->addClientOption('body', json_encode($data));
-
             try {
-                $response = $this->call('PUT');
+                $response = $this->client->post('database/contacts/' . $existingRefID, $data);
             } catch (Exception $e) {
                 // Handle API error
                 $this->exitWithError($e);
@@ -251,7 +285,6 @@ class UbiquityService extends RestfulService
             if ($response && $response->getStatusCode() === 200) {
                 return true;
             }
-
             return false;
         }
     }
@@ -266,25 +299,30 @@ class UbiquityService extends RestfulService
         if (!$form->UbiquitySuccessFormEmailTriggerID ||
             !$form->UbiquitySuccessFormID ||
             !$form->UbiquitySuccessFormAction
-        ) {
-            return false;
-        }
+        ) return false;
 
-        $formID = $form->UbiquitySuccessFormID;
-        $this->setUri("forms/$formID/submit");
-
-        $info = array('referenceID' => $refID, 'source' => $form->Link());
-        $data = array('data' => array(array('fieldID' => $form->UbiquitySuccessFormEmailTriggerID, 'value' => $form->UbiquitySuccessFormAction)));
-        $this->addClientOption('body', json_encode(array_merge($info, $data)));
+        $data = [
+            'json' => [
+                [
+                    'fieldID' => $form->UbiquitySuccessFormEmailTriggerID,
+                    'value'   => $form->UbiquitySuccessFormAction,
+                    'referenceID' => $refID,
+                    'source' => $form->Link()
+                ]
+            ],
+            'query' => [
+                'apiToken' => $this->targetDatabase['Token'],
+                'format' => 'json',
+            ]
+        ];
 
         try {
-            $response = $this->call('POST');
+            $response = $this->client->post('forms/'.$formID.'/submit', $data);
 
             // Return the reference ID of the newly created entry
             $returnedData = $this->parseBody($response->getBody());
-            if (isset($returnedData['referenceID'])) {
-                return $returnedData['referenceID'];
-            }
+
+            if (isset($returnedData['referenceID'])) return $returnedData['referenceID'];
             return true;
         } catch (Exception $e) {
             // Handle API error
@@ -308,16 +346,19 @@ class UbiquityService extends RestfulService
             user_error('Email address is no valid!', E_USER_ERROR);
         }
 
-        $this->setUri('database/contacts');
-
         $filter = $this->builFilterQueryString(array($emailField));
-        $this->updateQueryOption('filter', $filter);
+
+        $data = [
+            'query' => [
+                'apiToken' => $this->targetDatabase['Token'],
+                'filter'   => $filter
+            ]
+        ];
 
         try {
-            $response = $this->call();
+            $response = $this->client->get('database/contacts', $data);
             // Always clear the query params
             // in case we reuse the same request
-            $this->clearQueryOption('filter');
         } catch (Exception $e) {
             $this->exitWithError($e);
         }
@@ -481,16 +522,16 @@ class UbiquityService extends RestfulService
         $updatables = array_filter($fields, function ($field) use ($emptyRemoteFields) {
             // Check if the field has an empty value in the database
             $emptyRemoteField = array_filter($emptyRemoteFields, function ($remote) use ($field) {
-                return ($remote['fieldID'] == $field['fieldID']);
+                if (isset($remote['fieldID']) && isset($field['fieldID'])) {
+                    return ($remote['fieldID'] == $field['fieldID']);
+                }
             });
-
             // If the remote field has an empty value
             // and we have an actual value to push
             // inlcude the field
             if (!empty($emptyRemoteField) && isset($field['value']) && !empty($field['value'])) {
                 return true;
             }
-
             // Otherwise, if the remote field is not empty
             // make sure we can override it
             if (empty($emptyRemoteField)) {
@@ -499,7 +540,6 @@ class UbiquityService extends RestfulService
                     return true;
                 }
             }
-
             return false;
         });
 
