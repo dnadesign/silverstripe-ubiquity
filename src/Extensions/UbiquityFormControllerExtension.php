@@ -44,7 +44,6 @@ class UbiquityFormControllerExtension extends DataExtension
             }
         }
 
-        // echo var_dump($ubiquityEmailField);
         // We need to send the editable option separatly
         // as they can have their own UbiquityFieldID even if their parent doesn't.
         $ubiquityOptions = EditableOption::get()->filter('ParentID', $userForm->Fields()->column('ID'))->exclude('UbiquityFieldID', '');
