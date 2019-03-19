@@ -26,17 +26,6 @@ class UbiquityService
                 'query' => array(
                     'apiToken' => ''
                 ),
-                // 'on_stats' => function (GuzzleHttp\TransferStats $stats) {
-                //     //                echo sprintf("URL: %s\r\n", $stats->getEffectiveUri());
-                //     echo sprintf("Response time: %s\r\n", $stats->getTransferTime());
-                    
-                //     if($stats->hasResponse()) {
-                //         echo sprintf("Response status: %s\r\n", $stats->getResponse()->getStatusCode());
-                //     } else {
-                //         var_dump($stats->getHandlerErrorData());
-                //         exit;
-                //     }
-                // }
             )
         );
     }

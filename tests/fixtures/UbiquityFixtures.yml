@@ -7,7 +7,7 @@ UbiquityDatabase:
     Environment: staging
     Title: lorem
     ID: 1
-    APIKey: vTOcfExyXSK8zpC9eRF060UosJZy-hkZShFz9jRkG0cJjwD3yBZjS3ElcTn5Dj_coT0nNlqtnoustyeLlYzq-GbQacqOBHbiFxD6dvA4-tI4vttT1gJqdA6HJsfcrJWJug9V4M_5ajo
+    APIKey: xxxxxx
 
 Member:
   dev:
@@ -23,7 +23,7 @@ UserDefinedForm:
 EditableTextField:
   email:
     Title: Email
-    UbiquityFieldID: CvY5o-IIq0yc7gjWqGO2-Q
+    UbiquityFieldID: xxxxxx
     Parent: =>UserDefinedForm.testform
 
 
