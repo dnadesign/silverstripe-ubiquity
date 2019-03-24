@@ -1,4 +1,4 @@
-# Ubiquity for Silverstripe
+# Ubiquity for Silverstripe - IN DEVELOPMENT
 ## Introduction
 Integrate data with https://www.qrious.co.nz/products/ubiquity
 ##Requirements
