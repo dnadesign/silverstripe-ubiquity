@@ -1,0 +1,22 @@
+{
+	"name": "dnadesign/silverstripe-ubiquity",
+	"description": "Implements Ubiquity extensions for User Defined Forms",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "ubiquity", "newsletter"],
+	"license": "MIT",
+	"authors": [{
+		"name": "Garry Yeatman",
+		"email": "garry.yeatman@dna.co.nz"
+	}],
+	"minimum-stability": "dev",
+	"require": {
+		"silverstripe/framework": "~3.7",
+		"silverstripe/cms": "~3.7"
+	},
+    "require-dev": {
+        "phpunit/PHPUnit": "~3.7@stable"
+    },
+	"extra": {
+		"installer-name": "silverstripe-ubiquity"
+    }
+}
