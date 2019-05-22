@@ -51,7 +51,7 @@ class UbiquitySiteConfigExtension extends DataExtension
 
             $fields->addFieldToTab(
                 'Root.Ubiquity',
-                CheckboxField::create('DebugUbiquityAnalytics', 'Debug mode: Allow Ubiquity Analytics data to be sent to from Staging.')
+                CheckboxField::create('DebugUbiquityAnalytics', 'Debug mode: Allow Ubiquity Analytics data to be sent from Staging.')
             );
         }
 
