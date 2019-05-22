@@ -19,6 +19,10 @@ use DNADesign\Ubiquity\Services\UbiquityService;
  */
 class UbiquityUserFormControllerExtension extends Extension
 {
+
+    /**
+     * Submit data to ubiquity after UDF processing
+     */
     public function updateAfterProcess()
     {
         if (!UbiquityService::is_ubiquity_enabled()) {
