@@ -1,13 +1,5 @@
 <?php
 
-namespace DNADesign\Ubiquity\Extensions;
-
-use Extension;
-use Exception;
-use EditableOption;
-use Director;
-use DNADesign\Ubiquity\Services\UbiquityService;
-
 /**
  * Submit to ubiquity after a UDF submission
  * This will be skipped if a databaseID is not defined on the form.
@@ -25,7 +17,7 @@ class UbiquityUserFormControllerExtension extends Extension
      */
     public function updateAfterProcess()
     {
-        if (!UbiquityService::is_ubiquity_enabled()) {
+        if (!UbiquityService::get_ubiquity_enabled()) {
             return;
         }
 
@@ -71,12 +63,10 @@ class UbiquityUserFormControllerExtension extends Extension
             $data = array_filter($data);
         
             // submit to ubiquity
-            // $ubiquityData = UbiquityService::prepare_data($ubiquityFields, $ubiquityOptions, $data);
             $referenceID = $service->createOrUpdateContact($data);
 
             // Once we sign up the user, we need to send them an email which is triggered
             // by posting to a Ubiquity Form.
-            // Note: exceptions are caught in triggerForm()
             if ($referenceID && $referenceID !== true
                 && $userForm->UbiquitySuccessFormEmailTriggerID
                 && $userForm->UbiquitySuccessFormID
@@ -89,7 +79,7 @@ class UbiquityUserFormControllerExtension extends Extension
                     'source' => $userForm->Link() // form source is always a link to the form
                 ];
                 
-                // $emailSent = $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
+                $emailSent = $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
             }
         } catch (Exception $e) {
             $this->exitWithError($e);

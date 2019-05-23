@@ -1,24 +1,9 @@
 <?php
 
-namespace DNADesign\Ubiquity\Extensions;
-
-use UbiquityDatabase;
-use TextField;
-use Subsite;
-use LiteralField;
-use FieldList;
-use Extension;
-use DropdownField;
-use Director;
-use DNADesign\Ubiquity\Services\UbiquityService;
-use CheckboxField;
-
 /**
  * Adds Ubiquity setup to a DataObject that contains a form.
- * Note to be enabled, the current subsite must have Ubiquity enabled
- * and databases set up for the current development enviornment.
  */
-class UbiquityFormExtension extends Extension
+class UbiquityFormExtension extends \Extension
 {
     private static $db = [
         'UbiquitySuccessFormID' => 'Varchar(100)',
@@ -33,21 +18,18 @@ class UbiquityFormExtension extends Extension
         'UbiquityDatabase' => 'UbiquityDatabase'
     ];
 
-    public function updateCMSFields(FieldList $fields)
+    public function updateCMSFields(\FieldList $fields)
     {
-        // Check if Ubiquity is enabled for the current subsite (always enabled for the main site)
-        if (!UbiquityService::is_ubiquity_enabled()) {
-            $fields->addFieldToTab('Root.UbiquityConfig', new LiteralField('Warning', sprintf(
-                "<p class=\"message\">Ubiquity is not enabled for this subsite (%s).</p>",
-                Subsite::currentSubsiteID()
-            )));
+        // Check if Ubiquity is enabled and display a message if not
+        if (!UbiquityService::get_ubiquity_enabled()) {
+            $fields->addFieldToTab('Root.UbiquityConfig', new LiteralField('Warning', "<p class=\"message\">Ubiquity is not enabled in siteconfig.</p>"));
             return;
         }
 
         // Check if Ubiquity databases exist for the current development
         // environment - staging (dev/test) or production (live)
-        $databases = UbiquityDatabase::get_available_databases();
-        if (!$databases || empty($databases)) {
+        $databaseOptions = UbiquityDatabase::get_database_options();
+        if (empty($databaseOptions)) {
             $fields->addFieldToTab('Root.UbiquityConfig', new LiteralField('Warning', sprintf(
                 "<p class=\"message\">No Ubiquity databases are set up for this environment (%s) in SiteConfig</p>",
                 Director::get_environment_type()
@@ -55,15 +37,10 @@ class UbiquityFormExtension extends Extension
             return;
         }
 
-        $databaseOptions = [];
-        foreach ($databases as $database) {
-            $databaseOptions[$database->ID] = $database->NiceTitle();
-        }
-
         // Ubiquity Database to post data to (from a list of databases for the current
         // development enviornment - staging (dev/test) or production (live)
         $database = DropdownField::create('UbiquityDatabaseID', 'Ubiquity Database', $databaseOptions)
-            ->setEmptyString('(Select one)');
+            ->setEmptyString('-- Select one --');
         
         // Ubiquity allows submitting data to a form as well, usually tied to the Ubiquity database
         // By populating the Sucess Form ID, you can automatically trigger an email response to

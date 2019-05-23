@@ -1,21 +1,6 @@
 <?php
 
-namespace DNADesign\Ubiquity\Services;
-
-use Subsite;
-use SiteConfig;
-use GuzzleHttp\TransferStats;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Client;
-use Exception;
-use Director;
-use DataObject;
-use Controller;
-use Config;
-use ArrayList;
 
 class UbiquityService
 {
@@ -25,10 +10,14 @@ class UbiquityService
 
     protected $database;
 
+    private static $base_uri = 'https://api.ubiquity.co.nz/';
+
+    static $_cached_ubiquity_fields;
+
     /**
      * @param UbiquityDatabase
      */
-    public function __construct($database)
+    public function __construct(UbiquityDatabase $database)
     {
         if (!$database->exists()) {
             user_error('Ubiquity Database does not exist', E_USER_ERROR);
@@ -45,35 +34,23 @@ class UbiquityService
     }
 
     /**
-     * Determine if ubiquity is enabled for the current subsite
+     * Determine if ubiquity is enabled
      *
      * @return boolean
      */
-    public static function is_ubiquity_enabled()
+    public static function get_ubiquity_enabled()
     {
-        $currentSubsiteID = Subsite::singleton()->currentSubsiteID();
-
-        if (!$currentSubsiteID) {
-            // always enable ubiquity for main site
-            return true;
-        }
-
-        $mainSiteConfig = DataObject::get_one('SiteConfig', 'SubsiteID = 0');
-
-        if ($allEnabledSites = explode(',', $mainSiteConfig->UbiquityEnabledSubsites)) {
-            return in_array($currentSubsiteID, $allEnabledSites);
-        }
-
-        return false;
+        return SiteConfig::current_site_config()->UbiquityEnabled;
     }
-
+    
     /**
      *  Return the Ref ID of the email field
      */
     public function getUbiquityEmailFieldID()
     {
+        // TODO cache the fields
         $fields = $this->getUbiquityDatabaseFields();
-    
+        
         if (!$fields || !is_array($fields)) {
             return false;
         }
@@ -81,32 +58,38 @@ class UbiquityService
         $list = ArrayList::create($fields);
         $field = $list->filter([
             'type' => 'Email',
-            'isNullable' => true
+            'isNullable' => false
         ])->first();
             
         if (!$field || empty($field) || !isset($field['fieldID'])) {
             return false;
         }
-            
+
         return $field['fieldID'];
     }
 
     /**
      * Get fields for the database from ubiquity
+     * Caches the fields so we only make one call in this class
      *
      * @return array|false
      */
     public function getUbiquityDatabaseFields()
     {
-        $response = $this->call(self::METHOD_GET, 'database/fields');
+        if (self::$_cached_ubiquity_fields) {
+            return self::$_cached_ubiquity_fields;
+        }
 
+        $response = $this->call(self::METHOD_GET, 'database/fields');
         $result = $this->decodeResponse($response);
 
         if (!isset($result['fields'])) {
-            return [];
+            self::$_cached_ubiquity_fields = null;
+        } else {
+            self::$_cached_ubiquity_fields = $result['fields'];
         }
 
-        return $result['fields'];
+        return self::$_cached_ubiquity_fields;
     }
 
     /**
@@ -135,14 +118,14 @@ class UbiquityService
      */
     public function getDefaultOptions()
     {
-        if (!$baseURI = Config::inst()->get('UbiquityService', 'base_uri')) {
-            throw new Exception('No base URI defiend for Ubiquity service');
+        if (!$baseURI = Config::inst()->get(self::class, 'base_uri')) {
+            throw new Exception('No base URI defined for Ubiquity service');
         }
 
         if (!$this->database) {
             throw new Exception('No Ubiqutiy database is set');
         }
-        
+
         $options = [
             'base_uri' => $baseURI,
             'headers' => [
@@ -265,6 +248,7 @@ class UbiquityService
     {
         // Check if contact already exists given the email form field
         $emailData = $this->getEmailData($data);
+        
         $contact = $this->getContact($emailData);
 
         $uri = 'database/contacts';
@@ -386,20 +370,31 @@ class UbiquityService
     }
 
     /**
+     * Determine if ubiquity analytis is enabled
+     *
+     * @return boolean
+     */
+    public static function get_ubiquity_analytics_enabled()
+    {
+        return SiteConfig::current_site_config()->UbiquityAnalyticsEnabled;
+    }
+
+    /**
      * Helper to get the Analytics keys
      */
     public static function get_analytics_keys()
     {
-        $siteConfig = SiteConfig::current_site_config();
         $analyticsKeys = [];
 
-        if ($siteConfig->EnableUbiquityAnalytics && (Director::isLive() || $siteConfig->DebugUbiquityAnalytics)) {
-            $keys = Config::inst()->get('UbiquityService', 'analytics_keys');
-            
-            if ($keys && is_array($keys)) {
-                foreach ($keys as $key) {
-                    array_push($analyticsKeys, ['Key' => $key]);
-                }
+        if (!self::get_ubiquity_analytics_enabled()) {
+            return $analyticsKeys;
+        }
+
+        $keys = Config::inst()->get('UbiquityService', 'analytics_keys');
+        
+        if ($keys && is_array($keys)) {
+            foreach ($keys as $key) {
+                array_push($analyticsKeys, ['Key' => $key]);
             }
         }
 

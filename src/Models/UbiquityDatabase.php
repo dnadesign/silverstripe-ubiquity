@@ -1,7 +1,5 @@
 <?php
 
-use DNADesign\Ubiquity\Services\UbiquityService;
-
 /**
  * Ubiquity Database model
  */
@@ -27,7 +25,9 @@ class UbiquityDatabase extends DataObject
         $fields = parent::getCMSFields();
         $fields->removeByName('SiteConfigID');
 
-        $environment = $this->isInDB() && $this->Environment ? $this->Environment : UbiquityService::get_ubiquity_environment();
+        $environment = $this->isInDB() && $this->Environment
+            ? $this->Environment
+            : UbiquityService::get_ubiquity_environment();
 
         $fields->addFieldsToTab('Root.Main', [
             ReadonlyField::create('Environment', 'Environment', $environment),
@@ -72,6 +72,18 @@ class UbiquityDatabase extends DataObject
 
         return $siteConfig->UbiquityDatabases()
             ->filter('Environment', $environment);
+    }
+
+    public static function get_database_options()
+    {
+        $databases = self::get_available_databases();
+
+        $options = [];
+        foreach ($databases as $database) {
+            $options[$database->ID] = $database->NiceTitle();
+        }
+
+        return $options;
     }
 
     /**

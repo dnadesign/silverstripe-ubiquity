@@ -1,11 +1,5 @@
 <?php
 
-namespace DNADesign\Ubiquity\Forms;
-
-use HtmlEditorField;
-use EditableCheckbox;
-use DBField;
-
 /**
  * A generic Signup Field that allows the checkbox label to be long text that includes Links
  */

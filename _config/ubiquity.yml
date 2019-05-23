@@ -2,39 +2,24 @@
 Name: ubiquityconfig
 ---
 
-UbiquityService:
-  base_uri: https://api.ubiquity.co.nz/
-  headers:
-    Accept: 'application/json'
-    'Content-Type': => 'application/json'
-  format: json
-
-  tracking_enabled: true
-
 SiteConfig:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquitySiteConfigExtension
-
+    - UbiquitySiteConfigExtension
 UserDefinedForm:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityFormExtension
-
+    - UbiquityFormExtension
 SubmittedForm:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityUserFormControllerExtension
-
+    - UbiquityUserFormControllerExtension
 EditableFormField:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityEditableFormFieldExtension
-
+    - UbiquityEditableFormFieldExtension
 EditableOption:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityEditableOptionExtension
-
+    - UbiquityEditableOptionExtension
 EditableMultipleOptionField:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityMultipleOptionExtension
-
+    - UbiquityMultipleOptionExtension
 Page_Controller:
   extensions:
-    - DNADesign\Ubiquity\Extensions\UbiquityPageControllerExtension
+    - UbiquityPageControllerExtension

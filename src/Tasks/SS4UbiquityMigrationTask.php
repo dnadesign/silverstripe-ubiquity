@@ -1,10 +1,5 @@
 <?php
 
-use UbiquityDatabase;
-use SQLUpdate;
-use Composer\Config;
-use BuildTask;
-
 class SS4UbiquityMigrationTask extends BuildTask
 {
     private static $segment = 'SS4UbiquityMigrationTask';

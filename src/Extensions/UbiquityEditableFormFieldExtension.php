@@ -1,12 +1,5 @@
 <?php
 
-namespace DNADesign\Ubiquity\Extensions;
-
-use TextField;
-use FieldList;
-use DataExtension;
-use CheckboxField;
-
 /**
  * Extension to add additional fields to EditableFormField
  * to enable a field to submit to an ubiquity form field.

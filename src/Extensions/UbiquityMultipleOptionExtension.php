@@ -1,13 +1,5 @@
 <?php
 
-namespace DNADesign\Ubiquity\Extensions;
-
-use TextField;
-use GridFieldEditableColumns;
-use FieldList;
-use DataExtension;
-use CheckboxField;
-
 /**
  * Extension for EditableMultipleOptionField
  * Allows sending a different value to Ubiquity that the value of the option selected
