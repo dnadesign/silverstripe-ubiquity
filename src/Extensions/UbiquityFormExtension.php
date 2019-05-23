@@ -6,6 +6,7 @@
 class UbiquityFormExtension extends \Extension
 {
     private static $db = [
+        'UbiquityEnabled' => 'Boolean',
         'UbiquitySuccessFormID' => 'Varchar(100)',
         'UbiquitySuccessFormEmailTriggerID' => 'Varchar(100)',
         'UbiquitySuccessFormAction' => 'Varchar(100)',
@@ -36,6 +37,8 @@ class UbiquityFormExtension extends \Extension
             )));
             return;
         }
+
+        $enabled = CheckboxField::create('UbiquityEnabled', 'Ubiquity Enabled');
 
         // Ubiquity Database to post data to (from a list of databases for the current
         // development enviornment - staging (dev/test) or production (live)
@@ -70,6 +73,7 @@ class UbiquityFormExtension extends \Extension
             ->setDescription('Submit the source data even if a T&C\'s field exists but is not ticked');
 
         $fields->addFieldsToTab('Root.Ubiquity', [
+            $enabled,
             $database,
             $formID,
             $formFieldID,

@@ -21,9 +21,18 @@ class UbiquityUserFormControllerExtension extends Extension
             return;
         }
 
-        try {
-            $userForm = $this->owner->parent()->data();
+        $userForm = $this->owner->parent()->data();
 
+        if (!$userForm->UbiquityEnabled) {
+            return;
+        }
+
+        if (!$userForm->UbiquityDatabase()->exists())
+        {
+            return;
+        }
+
+        try {
             $database = $userForm->UbiquityDatabase();
 
             // Set the Datatbase ID on the service
