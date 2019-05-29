@@ -11,3 +11,7 @@ To set this up,
 - 4. Enter the user defined form you wish to edit.
 - 5. Under the Ubiquity Config, select the Ubiquity database you want to work with.
 - 6. You will be able to add the ubiquity form ids to a user defined form.
+##Analytics Template Code
+<% if $SiteConfig.UbiquityAnalyticsEnabled %>
+	<script src="https://wt.engage.ubiquity.co.nz/device/register/$SiteConfig.UbiquityAnalyticsKey" async="true"></script>
+<% end_if %>
