@@ -5,6 +5,17 @@
  */
 class UbiquityPageControllerExtension extends Extension
 {
+    public function onAfterInit() {
+        $SiteConfig = SiteConfig::current_site_config();
+
+        if ($SiteConfig->UbiquityAnalyticsEnabled) {
+            Requirements::javascript('https://wt.engage.ubiquity.co.nz/device/register/'.$SiteConfig->UbiquityAnalyticsKey, [
+                'async' => true,
+                'set_write_js_to_body' => false
+            ]);
+        }
+    }
+
     /**
      * Fetch Ubiquity traking keys for use in templates
      */
@@ -13,9 +24,5 @@ class UbiquityPageControllerExtension extends Extension
         // get the analytics keys, and check if tracking is enabled
         $keys = UbiquityService::get_analytics_keys();
         return (!empty($keys)) ? new ArrayList($keys) : null;
-
-        Requirements::javascript('https://wt.engage.ubiquity.co.nz/device/register/$SiteConfig.UbiquityAnalyticsKey', [
-            'async' => true
-        ])->set_force_js_to_bottom(true);
     }
 }
