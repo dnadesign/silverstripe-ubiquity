@@ -68,7 +68,7 @@ class UbiquityDatabase extends DataObject
     public static function get_available_databases()
     {
         $siteConfig = SiteConfig::current_site_config();
-        $environment = Director::isLive() ? 'production' : 'staging';
+        $environment = Director::get_environment_type();
 
         return $siteConfig->UbiquityDatabases()
             ->filter('Environment', $environment);
