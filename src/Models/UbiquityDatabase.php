@@ -27,7 +27,7 @@ class UbiquityDatabase extends DataObject
 
         $environment = $this->isInDB() && $this->Environment
             ? $this->Environment
-            : UbiquityService::get_ubiquity_environment();
+            : Director::get_environment_type();
 
         $fields->addFieldsToTab('Root.Main', [
             ReadonlyField::create('Environment', 'Environment', $environment),
@@ -44,7 +44,7 @@ class UbiquityDatabase extends DataObject
     public function onBeforeWrite()
     {
         if (!$this->isInDB() || !$this->Environment) {
-            $this->Environment = UbiquityService::get_ubiquity_environment();
+            $this->Environment = Director::get_environment_type();
         }
 
         parent::onBeforeWrite();
