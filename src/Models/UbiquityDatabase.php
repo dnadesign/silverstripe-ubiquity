@@ -93,7 +93,7 @@ class UbiquityDatabase extends DataObject
      */
     public function isValidDatabase()
     {
-        $environment = Director::isLive() ? 'production' : 'staging';
+        $environment = Director::get_environment_type();
 
         if ($environment !== $this->Environment) {
             return sprintf("Invalid Ubiquity database (%s) for environnment", $this->NiceTitle());
