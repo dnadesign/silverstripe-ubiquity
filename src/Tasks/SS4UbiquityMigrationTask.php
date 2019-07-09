@@ -12,8 +12,6 @@ class SS4UbiquityMigrationTask extends BuildTask
 
     protected $description = 'SS4 Migration: Update Ubiquity models to namespaces';
 
-    protected $enabled = false;
-
     public function run($request)
     {
         try {
