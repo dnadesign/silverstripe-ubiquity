@@ -27,7 +27,7 @@ class UbiquityDatabase extends DataObject
 
         $environment = $this->isInDB() && $this->Environment
             ? $this->Environment
-            : UbiquityService::get_ubiquity_environment();
+            : Director::get_environment_type();
 
         $fields->addFieldsToTab('Root.Main', [
             ReadonlyField::create('Environment', 'Environment', $environment),
@@ -44,7 +44,7 @@ class UbiquityDatabase extends DataObject
     public function onBeforeWrite()
     {
         if (!$this->isInDB() || !$this->Environment) {
-            $this->Environment = UbiquityService::get_ubiquity_environment();
+            $this->Environment = Director::get_environment_type();
         }
 
         parent::onBeforeWrite();
@@ -68,7 +68,7 @@ class UbiquityDatabase extends DataObject
     public static function get_available_databases()
     {
         $siteConfig = SiteConfig::current_site_config();
-        $environment = Director::isLive() ? 'production' : 'staging';
+        $environment = Director::get_environment_type();
 
         return $siteConfig->UbiquityDatabases()
             ->filter('Environment', $environment);
@@ -93,7 +93,7 @@ class UbiquityDatabase extends DataObject
      */
     public function isValidDatabase()
     {
-        $environment = Director::isLive() ? 'production' : 'staging';
+        $environment = Director::get_environment_type();
 
         if ($environment !== $this->Environment) {
             return sprintf("Invalid Ubiquity database (%s) for environnment", $this->NiceTitle());

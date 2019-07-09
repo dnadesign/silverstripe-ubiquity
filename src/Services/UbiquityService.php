@@ -8,6 +8,8 @@ class UbiquityService
 
     const METHOD_POST = 'POST';
 
+    const METHOD_PUT = 'PUT';
+
     protected $database;
 
     private static $base_uri = 'https://api.ubiquity.co.nz/';
@@ -152,7 +154,7 @@ class UbiquityService
      */
     public function call($method = null, string $uri = null, $query = null, $data = null)
     {
-        if (!in_array($method, [self::METHOD_GET, self::METHOD_POST])) {
+        if (!in_array($method, [self::METHOD_GET, self::METHOD_POST, self::METHOD_PUT])) {
             throw new Exception('Invalid Ubiqutiy request method');
         }
 
@@ -258,6 +260,9 @@ class UbiquityService
             $id = $contact['referenceID'];
             $uri .= '/' . $id;
             $data = $this->filterUpdateData($data, $contact);
+            $method = self::METHOD_PUT;
+        } else {
+            $method = self::METHOD_POST;
         }
 
         // If there is no data to update, exit here
@@ -265,7 +270,7 @@ class UbiquityService
             return true;
         }
         
-        $response = $this->call(self::METHOD_POST, $uri, null, $data);
+        $response = $this->call($method, $uri, null, $data);
     
         if ($contact) {
             if ($response->getStatusCode() !== 200) {
