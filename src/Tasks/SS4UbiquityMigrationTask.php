@@ -1,5 +1,10 @@
 <?php
 
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\Queries\SQLUpdate;
+use Ubiquity\Models\UbiquityDatabase;
+
 class SS4UbiquityMigrationTask extends BuildTask
 {
     private static $segment = 'SS4UbiquityMigrationTask';

@@ -1,9 +1,21 @@
 <?php
 
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Extension;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextField;
+use Ubiquity\Models\UbiquityDatabase;
+use Ubiquity\Services\UbiquityService;
+
 /**
  * Adds Ubiquity setup to a DataObject that contains a form.
  */
-class UbiquityFormExtension extends \Extension
+class UbiquityFormExtension extends Extension
 {
     private static $db = [
         'UbiquityEnabled' => 'Boolean',
@@ -16,10 +28,10 @@ class UbiquityFormExtension extends \Extension
     ];
 
     private static $has_one = [
-        'UbiquityDatabase' => 'UbiquityDatabase'
+        'UbiquityDatabase' => UbiquityDatabase::class
     ];
 
-    public function updateCMSFields(\FieldList $fields)
+    public function updateCMSFields(FieldList $fields)
     {
         // Check if Ubiquity is enabled and display a message if not
         if (!UbiquityService::get_ubiquity_enabled()) {
@@ -44,26 +56,26 @@ class UbiquityFormExtension extends \Extension
         // development enviornment - staging (dev/test) or production (live)
         $database = DropdownField::create('UbiquityDatabaseID', 'Ubiquity Database', $databaseOptions)
             ->setEmptyString('-- Select one --');
-        
+
         // Ubiquity allows submitting data to a form as well, usually tied to the Ubiquity database
         // By populating the Sucess Form ID, you can automatically trigger an email response to
         // be sent to the user, as if the Form was submitted directly.
         $formID = TextField::create('UbiquitySuccessFormID', 'Ubiquity Success Form ID')
             ->setDescription('ID of the form that will be used to send confirmation email once the user has signed up.');
-        
+
         // To trigger emails of the form, you must define which field the form needs to have the email sent.
         $formFieldID = TextField::create('UbiquitySuccessFormEmailTriggerID', 'Ubiquity Success Form Field ID')
             ->setDescription('ID of the field that will be used to send the form action (ususally named EmailTrigger)');
-        
+
         // Ubiquity forms can send different emails, define the Action that will send the email
         $formAction = TextField::create('UbiquitySuccessFormAction', 'Ubiquity Success Form Action')
             ->setDescription('Name of the Email that should be sent.');
-        
+
         // Allows Ubiquity to track the soure of the submission, eg newsletter signup, event form, feedback form
         // Define the FieldID of the Ubiquity Field
         $sourceID = TextField::create('UbiquitySourceFieldID', 'Ubiquity Source Field ID')
             ->setDescription('ID of the field that will be use as primary source for the user.');
-        
+
         // Define the Name of the source to populate the above field
         $sourceName = TextField::create('UbiquitySourceName', 'Ubiquity Source Name')
             ->setDescription('Reference of this form as source.');

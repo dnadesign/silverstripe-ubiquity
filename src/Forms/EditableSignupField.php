@@ -1,13 +1,23 @@
 <?php
 
+namespace Ubiquity\Forms\Fields;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\UserForms\Model\EditableFormField\EditableCheckbox;
+use Ubiquity\Forms\Fields\EditableSignupField;
+
 /**
  * A generic Signup Field that allows the checkbox label to be long text that includes Links
  */
 class EditableSignupField extends EditableCheckbox
 {
-    private static $singular_name = 'Sign up Field';
+    private static $singular_name = 'Ubiquity Sign up Field';
 
-    private static $plural_name = 'Sign up Fields';
+    private static $plural_name = 'Ubiquity Sign up Fields';
+
+    private static $table_name = 'EditableSignupField';
 
     protected $extraClasses = [
         'checkbox',
@@ -18,23 +28,12 @@ class EditableSignupField extends EditableCheckbox
         'HTMLLabel' => 'HTMLText'
     ];
 
-    protected $htmlLabel;
-
-    /**
-     * @param
-     */
-    public function __construct($name = "", $title = "", $checked = null, $htmlLabel = null)
-    {
-        parent::__construct($name, $title, $checked);
-        $this->htmlLabel = $htmlLabel;
-    }
-
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function ($fields) {
             $fields->addFieldToTab(
                 'Root.Main',
-                HtmlEditorField::create('HTMLLabel', 'Label HTML')
+                HTMLEditorField::create('HTMLLabel', 'Label HTML')
                     ->setRows(3)
                     ->setDescription('Note all HTML except links will be stripped out'),
                 'RightTitle'
@@ -50,9 +49,7 @@ class EditableSignupField extends EditableCheckbox
      */
     public function getFormField()
     {
-        $field = EditableSignupField::create($this->Name, $this->EscapedTitle, $this->CheckedDefault, $this->HTMLLabel)
-            ->setFieldHolderTemplate('EditableSignupField_holder')
-            ->setTemplate('EditableSignupField')
+        $field = CheckboxField::create($this->Name, $this->getLabel(), $this->CheckedDefault)
             ->addExtraClass('ubiquitysignup');
 
         $this->doUpdateFormField($field);
@@ -60,14 +57,23 @@ class EditableSignupField extends EditableCheckbox
         return $field;
     }
 
-
     /**
-     * Get the label for the field, strip HTML but keep links
+     * Get the label for the field
      *
      * @return DBField
      */
-    public function getHTMLLabel()
+    public function getLabel()
     {
-        return DBField::create_field('HTMLText', strip_tags($this->htmlLabel, '<a>'))->forTemplate();
+        return ($this->HTMLLabel) ? $this->getEscapedHTMLLabel() : $this->getEscapedTitle();
+    }
+
+    /**
+     * Strip HTML but keep links
+     *
+     * @return DBField
+     */
+    public function getEscapedHTMLLabel()
+    {
+        return DBField::create_field('HTMLText', strip_tags($this->HTMLLabel, '<a>'));
     }
 }

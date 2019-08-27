@@ -1,9 +1,14 @@
 # Ubiquity for Silverstripe - IN DEVELOPMENT
+
 ## Introduction
 Integrate data with https://www.qrious.co.nz/products/ubiquity
-##Requirements
-Silverstripe 3.7 (Silverstripe 4 compatibility is coming)
-##Set Up
+
+## Requirements
+"silverstripe/framework": "^4",
+"silverstripe/cms": "^4",
+"silverstripe/userforms": "^5"
+
+## Set Up
 To set this up,
 - 1. first log into the cms
 - 2. then go to site settings
