@@ -2,6 +2,7 @@
 
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DataObject;
+use Ubiquity\Models\UbiquityDatabase;
 use Ubiquity\Services\UbiquityService;
 
 class UbiquityTests extends BuildTask
@@ -14,13 +15,11 @@ class UbiquityTests extends BuildTask
 
     public function run($request)
     {
-        $service = new UbiquityService();
-        $databaseId = DataObject::get_one('UbiquityDatabase')->ID;
-
-        $service->setTargetDatabase($databaseId);
+        $database = DataObject::get_one(UbiquityDatabase::class);
+        $service = new UbiquityService($database);
 
         try {
-            $service->getEmailFieldRefID();
+            echo $service->getUbiquityEmailFieldID();
         } catch (Error $e) {
             var_dump($e->getMessage());
         }

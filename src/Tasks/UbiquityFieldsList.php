@@ -18,12 +18,9 @@ class UbiquityFieldsList extends BuildTask
     public function run($request)
     {
         $databases = UbiquityDatabase::get();
-        $service = new UbiquityService();
 
         foreach ($databases as $database) {
-            $service
-                ->getTargetEnvironment($database->Environment)
-                ->setTargetDatabase($database->ID);
+            $service = new UbiquityService($database);
             $fields = $service->getUbiquityDatabaseFields();
             $this->outputTable($database->Title, $fields);
         };
