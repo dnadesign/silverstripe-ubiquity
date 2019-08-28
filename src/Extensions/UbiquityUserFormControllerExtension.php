@@ -9,6 +9,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\UserForms\Model\EditableFormField\EditableOption;
 use Ubiquity\Forms\Fields\EditableSignupField;
 use Ubiquity\Services\UbiquityService;
+use Exception;
 
 /**
  * Submit to ubiquity after a UDF submission

@@ -8,6 +8,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\SiteConfig\SiteConfig;
 use Ubiquity\Models\UbiquityDatabase;
+use Exception;
 
 class UbiquityService
 {
