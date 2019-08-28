@@ -173,7 +173,7 @@ class UbiquityService
         }
 
         if ($data) {
-            $options['json'] = ['data' => $data];
+            $options['json'] = $data;
         }
 
         $client = new Client;
@@ -278,7 +278,7 @@ class UbiquityService
             return true;
         }
 
-        $response = $this->call($method, $uri, null, $data);
+        $response = $this->call($method, $uri, null, ['data' => $data]);
 
         if ($contact) {
             if ($response->getStatusCode() !== 200) {
@@ -291,7 +291,7 @@ class UbiquityService
             return $result['referenceID'];
         } else {
             if ($response->getStatusCode() !== 201) {
-                throw new Exception('An ubiquity API error occured (c)reate');
+                throw new Exception('An ubiquity API error occured (create)');
             }
 
             // updating an existing contact needs to return true if successful
@@ -308,6 +308,7 @@ class UbiquityService
         $uri = Controller::join_links('forms', $formID, 'submit');
         $response = $this->call(self::METHOD_POST, $uri, null, $data);
 
+        // TODO: check that response is still correct when form trigger is set up correctly
         if (!isset($result['referenceID']) || !$result['referenceID']) {
             throw new Exception('referenceID not found in response');
         }

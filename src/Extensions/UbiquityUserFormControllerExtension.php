@@ -71,6 +71,12 @@ class UbiquityUserFormControllerExtension extends Extension
             }
 
             $data = $this->formatData();
+            // If there are no Ubiquity fields set
+            // exit here
+            // Note: this should not happen as it is meant ot be filtered before that.
+            if ($data === false) {
+                return false;
+            }
 
             if ($submitSource && $userForm->UbiquitySourceFieldID && $userForm->UbiquitySourceName) {
                 array_push($data, [
@@ -93,10 +99,11 @@ class UbiquityUserFormControllerExtension extends Extension
                 && $userForm->UbiquitySuccessFormAction
             ) {
                 $data = [
-                    'fieldID' => $userForm->UbiquitySuccessFormEmailTriggerID,
-                    'value'   => $userForm->UbiquitySuccessFormAction,
                     'referenceID' => $referenceID,
-                    'source' => $userForm->Link() // form source is always a link to the form
+                    'fieldID' => $userForm->UbiquitySuccessFormEmailTriggerID,
+                    'formAction'   => $userForm->UbiquitySuccessFormAction,
+                    'source' => $userForm->Link(), // form source is always a link to the form
+                    'data' => $data
                 ];
 
                 $emailSent = $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
@@ -124,11 +131,11 @@ class UbiquityUserFormControllerExtension extends Extension
         // Check if there are any ubiquity fields in the form
         $fields = $userForm
             ->Fields()
-            ->exclude('UbiquityFieldID', '');
+            ->exclude('UbiquityFieldID', ['', null]);
 
         // not fields are set to update ubiquity
-        if (empty($fields)) {
-            return $data;
+        if ($fields->Count() < 1) {
+            return false;
         }
 
         foreach ($fields as $field) {
@@ -176,7 +183,7 @@ class UbiquityUserFormControllerExtension extends Extension
         // as they can have their own UbiquityFieldID even if their parent doesn't.
         $options = EditableOption::get()
             ->filter('ParentID', $userForm->Fields()->column('ID'))
-            ->exclude('UbiquityFieldID', '');
+            ->exclude('UbiquityFieldID', ['', null]);
 
         if ($options) {
             foreach ($options as $option) {
@@ -230,12 +237,13 @@ class UbiquityUserFormControllerExtension extends Extension
      */
     public function exitWithError(Exception $e)
     {
+        Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
+
         if (Director::isDev()) {
             echo $e->getMessage();
             exit();
         }
 
-        Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
-        exit();
+        return false;
     }
 }
