@@ -4,6 +4,7 @@ namespace Ubiquity\Extensions;
 
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
@@ -61,8 +62,8 @@ class UbiquityMultipleOptionExtension extends DataExtension
                 ]
             ]);
 
-            $conf->removeComponentsByType('GridFieldEditableColumns');
-            $conf->addComponent($editableColumns, 'GridFieldDeleteAction');
+            $conf->removeComponentsByType(GridFieldEditableColumns::class);
+            $conf->addComponent($editableColumns, GridFieldDeleteAction::class);
         }
 
         return $fields;
