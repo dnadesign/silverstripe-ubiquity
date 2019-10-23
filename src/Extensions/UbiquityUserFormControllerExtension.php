@@ -2,14 +2,15 @@
 
 namespace Ubiquity\Extensions;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Extension;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\UserForms\Model\EditableFormField\EditableCheckboxGroupField;
 use SilverStripe\UserForms\Model\EditableFormField\EditableOption;
 use Ubiquity\Forms\Fields\EditableSignupField;
 use Ubiquity\Services\UbiquityService;
-use Exception;
 
 /**
  * Submit to ubiquity after a UDF submission
@@ -185,13 +186,18 @@ class UbiquityUserFormControllerExtension extends Extension
             ->filter('ParentID', $userForm->Fields()->column('ID'))
             ->exclude('UbiquityFieldID', ['', null]);
 
-        if ($options) {
+        if ($options->count() > 0) {
             foreach ($options as $option) {
                 $fieldData = [];
 
-                // Finds it's parent value
+                // Finds its parent value
                 $parent = $option->Parent();
-                $selectedValue = (isset($data[$parent->Name])) ? $data[$parent->Name] : null;
+                $selectedValue = (isset($userFormData[$parent->Name])) ? $userFormData[$parent->Name] : null;
+                // EditableCheckboxGroupField return a comma seperated string, so need to transform it into an array
+                if ($selectedValue && $parent instanceof EditableCheckboxGroupField) {
+                    $values = explode(',', $selectedValue);
+                    $selectedValue = array_map('trim', $values);
+                }
 
                 // By default, set the value of a checkbox to null
                 // so it can be reset to default value on Ubiquity database
@@ -204,7 +210,7 @@ class UbiquityUserFormControllerExtension extends Extension
                 ];
 
                 // This option has been selected
-                // Send it's value or overriden valeu to Ubiquity
+                // Send its value or overriden value to Ubiquity
                 if ($selectedValue) {
                     // If multiple options, the data is an array
                     if ((is_array($selectedValue) && in_array($option->Title, $selectedValue))
