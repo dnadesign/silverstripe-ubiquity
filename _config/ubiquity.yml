@@ -10,7 +10,7 @@ SilverStripe\UserForms\Model\UserDefinedForm:
     - Ubiquity\Extensions\UbiquityFormExtension
 SilverStripe\UserForms\Model\Submission\SubmittedForm:
   extensions:
-    - Ubiquity\Extensions\UbiquityUserFormControllerExtension
+    - Ubiquity\Extensions\UbiquityUserFormSubmittedFormExtension
 SilverStripe\UserForms\Model\EditableFormField:
   extensions:
     - Ubiquity\Extensions\UbiquityEditableFormFieldExtension

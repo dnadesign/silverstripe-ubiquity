@@ -17,11 +17,11 @@ use Ubiquity\Services\UbiquityService;
  * This will be skipped if a databaseID is not defined on the form.
  * A user will be created or updated depending on wether or not they exist in the ubiquity database.
  * Source data can be submitted to Ubiquity
- * This will be skipped if a T&C's field exists in the form and hasnt been cheched, or
+ * This will be skipped if a T&C's field exists in the form and hasn't been checked, or
  *
- * todo, use try/catch in this class instead of UbiquityService, which shouldnt define how errors are handled
+ * todo, use try/catch in this class instead of UbiquityService, which shouldn't define how errors are handled
  */
-class UbiquityUserFormControllerExtension extends Extension
+class UbiquityUserFormSubmittedFormExtension extends Extension
 {
 
     /**
@@ -39,20 +39,21 @@ class UbiquityUserFormControllerExtension extends Extension
             return;
         }
 
-        if (!$userForm->UbiquityDatabase()->exists())
-        {
+        if (!$userForm->UbiquityDatabase()->exists()) {
             return;
         }
 
         try {
             $database = $userForm->UbiquityDatabase();
 
-            // Set the Datatbase ID on the service
+            // Set the Database ID on the service
             $service = new UbiquityService($database);
 
             // set the source data to send
-            $sourceData = [];
             $submitSource = true;
+
+            // Get submission data
+            $data = $this->formatData();
 
             // Deal with TermsConditions field.
             // If this field is included in the form, the form processor will need to determine if the field is checked.
@@ -64,14 +65,13 @@ class UbiquityUserFormControllerExtension extends Extension
                 $checked = isset($data[$signupField->Name]) ? $data[$signupField->Name] : false;
 
                 // if unchecked, we submit only the source field if 'UbiquitySubmitSource' is set on the Form
-                // If its not set, we dont submit anything.
-                // This allows an existing user in the databse to be updated with the source only
+                // If its not set, we don't submit anything.
+                // This allows an existing user in the database to be updated with the source only
                 if (filter_var($checked, FILTER_VALIDATE_BOOLEAN) === false && !$userForm->UbiquitySubmitSource) {
                     $submitSource = false;
                 }
             }
 
-            $data = $this->formatData();
             // If there are no Ubiquity fields set
             // exit here
             // Note: this should not happen as it is meant ot be filtered before that.
@@ -94,7 +94,8 @@ class UbiquityUserFormControllerExtension extends Extension
 
             // Once we sign up the user, we need to send them an email which is triggered
             // by posting to a Ubiquity Form.
-            if ($referenceID && $referenceID !== true
+            if (
+                $referenceID && $referenceID !== true
                 && $userForm->UbiquitySuccessFormEmailTriggerID
                 && $userForm->UbiquitySuccessFormID
                 && $userForm->UbiquitySuccessFormAction
@@ -117,7 +118,7 @@ class UbiquityUserFormControllerExtension extends Extension
 
 
     /**
-     * Parse the user Defiendd form fields to look for the ones with an
+     * Parse the user defined form fields to look for the ones with an
      * Ubiquity fieldID and return an array of UbiquityFieldID => value
      * to be posted to Ubiquity, appending the mandatory fields.
      *
@@ -180,7 +181,7 @@ class UbiquityUserFormControllerExtension extends Extension
             array_push($data, $fieldData);
         }
 
-        // We need to send the editable options separatly
+        // We need to send the editable options separately
         // as they can have their own UbiquityFieldID even if their parent doesn't.
         $options = EditableOption::get()
             ->filter('ParentID', $userForm->Fields()->column('ID'))
@@ -193,7 +194,7 @@ class UbiquityUserFormControllerExtension extends Extension
                 // Finds its parent value
                 $parent = $option->Parent();
                 $selectedValue = (isset($userFormData[$parent->Name])) ? $userFormData[$parent->Name] : null;
-                // EditableCheckboxGroupField return a comma seperated string, so need to transform it into an array
+                // EditableCheckboxGroupField return a comma separately string, so need to transform it into an array
                 if ($selectedValue && $parent instanceof EditableCheckboxGroupField) {
                     $values = explode(',', $selectedValue);
                     $selectedValue = array_map('trim', $values);
@@ -210,7 +211,7 @@ class UbiquityUserFormControllerExtension extends Extension
                 ];
 
                 // This option has been selected
-                // Send its value or overriden value to Ubiquity
+                // Send its value or overwritten value to Ubiquity
                 if ($selectedValue) {
                     // If multiple options, the data is an array
                     if ((is_array($selectedValue) && in_array($option->Title, $selectedValue))

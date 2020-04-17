@@ -302,6 +302,9 @@ class UbiquityService
     /**
      * Send data to a Ubiquity Form
      * Usually to trigger an email being sent from their end.
+     * 
+     * @throws Exception
+     * @return int
      */
     public function triggerForm($formID, $data)
     {
@@ -309,11 +312,11 @@ class UbiquityService
         $response = $this->call(self::METHOD_POST, $uri, null, $data);
 
         // TODO: check that response is still correct when form trigger is set up correctly
-        if (!isset($result['referenceID']) || !$result['referenceID']) {
+        if (!isset($response['referenceID']) || !$response['referenceID']) {
             throw new Exception('referenceID not found in response');
         }
 
-        return $result['referenceID'];
+        return $response['referenceID'];
     }
 
     /**
