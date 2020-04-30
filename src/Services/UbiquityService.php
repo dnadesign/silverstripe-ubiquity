@@ -26,7 +26,7 @@ class UbiquityService
         }
 
         // ensure the database environment matches the current environment
-        // we dont want to be pushing staging test data to an ubiquity prod database
+        // we don't want to be pushing staging test data to an ubiquity prod database
         $valid = $database->isValidDatabase();
         if ($valid !== true) {
             user_error($valid, E_USER_ERROR);
@@ -44,7 +44,7 @@ class UbiquityService
     {
         return SiteConfig::current_site_config()->UbiquityEnabled;
     }
-    
+
     /**
      *  Return the Ref ID of the email field
      */
@@ -52,17 +52,17 @@ class UbiquityService
     {
         // TODO cache the fields
         $fields = $this->getUbiquityDatabaseFields();
-        
+
         if (!$fields || !is_array($fields)) {
             return false;
         }
-        
+
         $list = ArrayList::create($fields);
         $field = $list->filter([
             'type' => 'Email',
             'isNullable' => false
         ])->first();
-            
+
         if (!$field || empty($field) || !isset($field['fieldID'])) {
             return false;
         }
@@ -107,7 +107,7 @@ class UbiquityService
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('Could not decode Ubiquity response');
         }
-        
+
         if (!is_array($result)) {
             throw new Exception('Ubiquity response is not an array');
         }
@@ -125,7 +125,7 @@ class UbiquityService
         }
 
         if (!$this->database) {
-            throw new Exception('No Ubiqutiy database is set');
+            throw new Exception('No Ubiquitiy database is set');
         }
 
         $options = [
@@ -139,7 +139,7 @@ class UbiquityService
                 'apiToken' => $this->database->APIKey
             ]
         ];
-        
+
         return $options;
     }
 
@@ -148,7 +148,7 @@ class UbiquityService
      *
      * @param string $method  get or post
      * @param string $uri  URI to append to the base_url
-     * @param string $query additional queriy or filter to add the endpoint
+     * @param string $query additional query or filter to add the endpoint
      * @param array $data to include in post body as json
      * @return  GuzzleHttp\Psr7\response
      */
@@ -159,15 +159,15 @@ class UbiquityService
         }
 
         $options = $this->getDefaultOptions();
-       
-        if ($query) {
+
+        if ($query && is_array($query)) {
             $options['query'] = array_merge($options['query'], $query);
         }
 
         if ($data) {
             $options['json'] = ['data' => $data];
         }
-       
+
         $client = new Client;
         $response = $client->request($method, $uri, $options);
 
@@ -178,13 +178,13 @@ class UbiquityService
      * Retrieves the ID of an existing entry if it exists
      *
      * @param Array $emailField the field containing the email address to check
-     * @return Int (ID) or false if it doesnt exist
+     * @return Int (ID) or false if it doesn't exist
      */
     public function getContact($emailData)
     {
         // get the email address submitted
         $email = (isset($emailData['value'])) ? $emailData['value'] : null;
-        
+
         // check the email address is valid
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             throw new Exception('Email field value is not a valid email address');
@@ -193,16 +193,16 @@ class UbiquityService
         $query = [
             'filter' => $this->buildFilterQueryString(array($emailData))
         ];
-    
+
         //self::get()?
         $response = $this->call(self::METHOD_GET, 'database/contacts', $query);
 
         if ($response->getStatusCode() !== 200) {
-            throw new Exception('An ubiquity API error occured (getContact)');
+            throw new Exception('An ubiquity API error occurred (getContact)');
         }
 
         $result = $this->decodeResponse($response);
-        
+
         if ($result && isset($result['totalReturned']) && $result['totalReturned'] > 0) {
             return $result['selectedContacts'][0];
         }
@@ -230,9 +230,9 @@ class UbiquityService
         }
 
         if (!$emailData) {
-            throw new Exception('No data fieldID mathcing Ubiquity email ID found');
+            throw new Exception('No data fieldID matching Ubiquity email ID found');
         }
-    
+
         // validate email
         if (filter_var($emailData['value'], FILTER_VALIDATE_EMAIL) === false) {
             throw new Exception('Invalid email address for ubiquity');
@@ -250,11 +250,11 @@ class UbiquityService
     {
         // Check if contact already exists given the email form field
         $emailData = $this->getEmailData($data);
-        
+
         $contact = $this->getContact($emailData);
 
         $uri = 'database/contacts';
-        
+
         if ($contact) {
             // update an existing contact
             $id = $contact['referenceID'];
@@ -269,21 +269,21 @@ class UbiquityService
         if (empty($data)) {
             return true;
         }
-        
+
         $response = $this->call($method, $uri, null, $data);
-    
+
         if ($contact) {
             if ($response->getStatusCode() !== 200) {
-                throw new Exception('An ubiquity API error occured (update)');
+                throw new Exception('An ubiquity API error occurred (update)');
             }
 
             $result = $this->decodeResponse($response);
 
-            // creating a new contect needs to return the referenceID
+            // creating a new contact needs to return the referenceID
             return $result['referenceID'];
         } else {
             if ($response->getStatusCode() !== 201) {
-                throw new Exception('An ubiquity API error occured (c)reate');
+                throw new Exception('An ubiquity API error occurred (create)');
             }
 
             // updating an existing contact needs to return true if successful
@@ -300,11 +300,11 @@ class UbiquityService
         $uri = Controller::join_links('forms', $formID, 'submit');
         $response = $this->call(self::METHOD_POST, $uri, null, $data);
 
-        if (!isset($result['referenceID']) || !$result['referenceID']) {
+        if (!isset($response['referenceID']) || !$response['referenceID']) {
             throw new Exception('referenceID not found in response');
         }
 
-        return $result['referenceID'];
+        return $response['referenceID'];
     }
 
     /**
@@ -358,7 +358,7 @@ class UbiquityService
             if (!empty($emptyRemoteField) && isset($row['value']) && !empty($row['value'])) {
                 return true;
             }
-            
+
             // Otherwise, if the remote field is not empty
             // make sure we can override it
             if (empty($emptyRemoteField)) {
@@ -375,7 +375,7 @@ class UbiquityService
     }
 
     /**
-     * Determine if ubiquity analytis is enabled
+     * Determine if ubiquity analytics is enabled
      *
      * @return boolean
      */
@@ -396,7 +396,7 @@ class UbiquityService
         }
 
         $keys = Config::inst()->get('UbiquityService', 'analytics_keys');
-        
+
         if ($keys && is_array($keys)) {
             foreach ($keys as $key) {
                 array_push($analyticsKeys, ['Key' => $key]);

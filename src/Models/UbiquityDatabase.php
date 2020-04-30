@@ -39,7 +39,7 @@ class UbiquityDatabase extends DataObject
     }
 
     /**
-     * Automatically save the environemnt with the data
+     * Automatically save the environment with the data
      */
     public function onBeforeWrite()
     {
@@ -96,7 +96,7 @@ class UbiquityDatabase extends DataObject
         $environment = Director::get_environment_type();
 
         if ($environment !== $this->Environment) {
-            return sprintf("Invalid Ubiquity database (%s) for environnment", $this->NiceTitle());
+            return sprintf("Invalid Ubiquity database (%s) for environment", $this->NiceTitle());
         }
 
         if (!$this->APIKey) {

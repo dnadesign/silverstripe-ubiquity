@@ -10,13 +10,13 @@ class UbiquityTests extends BuildTask
 
     public function run($request)
     {
-        $service = new UbiquityService();
-        $databaseId = DataObject::get_one('UbiquityDatabase')->ID;
-
-        $service->setTargetDatabase($databaseId);
+        $database = DataObject::get_one('UbiquityDatabase');
+        if ($database) {
+            $service = new UbiquityService($database);
+        }
 
         try {
-            $service->getEmailFieldRefID();
+            echo $service->getUbiquityEmailFieldID();
         } catch (Error $e) {
             var_dump($e->getMessage());
         }

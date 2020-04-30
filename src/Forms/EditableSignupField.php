@@ -46,7 +46,7 @@ class EditableSignupField extends EditableCheckbox
 
     /**
      * For the front end, return an UbiquityTermsAndConditionsField instead of a simple checkbox
-     * Alows us to have a specific template and reuse the UbiquityTermsAndConditionsField elsewhere
+     * Allows us to have a specific template and reuse the UbiquityTermsAndConditionsField elsewhere
      */
     public function getFormField()
     {
