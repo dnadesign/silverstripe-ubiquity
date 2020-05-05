@@ -25,12 +25,10 @@ class UbiquityDatabase extends DataObject
         $fields = parent::getCMSFields();
         $fields->removeByName('SiteConfigID');
 
-        $environment = $this->isInDB() && $this->Environment
-            ? $this->Environment
-            : Director::get_environment_type();
-
         $fields->addFieldsToTab('Root.Main', [
-            ReadonlyField::create('Environment', 'Environment', $environment),
+            DropdownField::create('Environment', 'Environment', ['dev' => 'dev', 'test' => 'test', 'live' => 'live'])
+                ->setDescription('Auto populates when saving.')
+                ->setEmptyString('Select'),
             TextField::create('Title', 'Ubiquity Database name'),
             TextField::create('APIKey', 'Ubiquity Database API token'),
         ]);

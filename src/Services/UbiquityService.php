@@ -300,11 +300,11 @@ class UbiquityService
         $uri = Controller::join_links('forms', $formID, 'submit');
         $response = $this->call(self::METHOD_POST, $uri, null, $data);
 
-        if (!isset($response['referenceID']) || !$response['referenceID']) {
-            throw new Exception('referenceID not found in response');
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception($response->getReasonPhrase());
         }
 
-        return $response['referenceID'];
+        return true;
     }
 
     /**

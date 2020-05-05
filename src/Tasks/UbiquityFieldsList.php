@@ -13,7 +13,7 @@ class UbiquityFieldsList extends BuildTask
 
     public function run($request)
     {
-        $databases = UbiquityDatabase::get();
+        $databases = UbiquityDatabase::get()->filter('Environment', Director::get_environment_type());
 
         foreach ($databases as $database) {
             $service = new UbiquityService($database);
