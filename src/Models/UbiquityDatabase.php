@@ -1,23 +1,33 @@
 <?php
 
+namespace Ubiquity\Models;
+
+use Exception;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\SiteConfig\SiteConfig;
+use Ubiquity\Services\UbiquityService;
+
 /**
  * Ubiquity Database model
  */
 class UbiquityDatabase extends DataObject
 {
+    private static $table_name = 'UbiquityDatabase';
+
     private static $db = [
-        'Environment' => 'Varchar(255)',
         'Title' => 'Varchar(255)',
         'APIKey' => 'Varchar(255)',
     ];
 
     private static $has_one = [
-        'SiteConfig' => 'SiteConfig',
+        'SiteConfig' => SiteConfig::class,
     ];
 
     private static $summary_fields = [
         'Title' => 'Name',
-        'Environment' => 'Environment'
+        'APIKey' => 'API Key'
     ];
 
     public function getCMSFields()
@@ -26,36 +36,17 @@ class UbiquityDatabase extends DataObject
         $fields->removeByName('SiteConfigID');
 
         $fields->addFieldsToTab('Root.Main', [
-            DropdownField::create('Environment', 'Environment', ['dev' => 'dev', 'test' => 'test', 'live' => 'live'])
-                ->setDescription('Auto populates when saving.')
-                ->setEmptyString('Select'),
             TextField::create('Title', 'Ubiquity Database name'),
             TextField::create('APIKey', 'Ubiquity Database API token'),
         ]);
 
-        return $fields;
-    }
-
-    /**
-     * Automatically save the environment with the data
-     */
-    public function onBeforeWrite()
-    {
-        if (!$this->isInDB() || !$this->Environment) {
-            $this->Environment = Director::get_environment_type();
+        // List database fields for reference
+        if ($this->IsInDB() && $this->isValidDatabase()) {
+            $table = LiteralField::create('FieldTable', $this->generateFieldsTable());
+            $fields->addFieldToTab('Root.Main', $table);
         }
 
-        parent::onBeforeWrite();
-    }
-
-    /**
-     * Nice Title
-     *
-     * @return string
-     */
-    public function NiceTitle()
-    {
-        return sprintf('%s [%s]', $this->Title, $this->Environment);
+        return $fields;
     }
 
     /**
@@ -66,10 +57,9 @@ class UbiquityDatabase extends DataObject
     public static function get_available_databases()
     {
         $siteConfig = SiteConfig::current_site_config();
-        $environment = Director::get_environment_type();
-
-        return $siteConfig->UbiquityDatabases()
-            ->filter('Environment', $environment);
+        if ($siteConfig) {
+            return $siteConfig->UbiquityDatabases();
+        }
     }
 
     public static function get_database_options()
@@ -78,7 +68,7 @@ class UbiquityDatabase extends DataObject
 
         $options = [];
         foreach ($databases as $database) {
-            $options[$database->ID] = $database->NiceTitle();
+            $options[$database->ID] = $database->Title;
         }
 
         return $options;
@@ -86,21 +76,46 @@ class UbiquityDatabase extends DataObject
 
     /**
      * Validate the database
-     * - Is in the correct environment
-     * - Has an API Token
      */
     public function isValidDatabase()
     {
-        $environment = Director::get_environment_type();
+        return strlen(trim($this->APIKey)) > 0;
+    }
 
-        if ($environment !== $this->Environment) {
-            return sprintf("Invalid Ubiquity database (%s) for environment", $this->NiceTitle());
+    /**
+     * Return a HTML table listing all the fields available in this database
+     * with their unique ID
+     *
+     * @return string
+     */
+    public function generateFieldsTable()
+    {
+        try {
+            $service = new UbiquityService($this);
+            if ($service) {
+                $fields = $service->getUbiquityDatabaseFields();
+                if ($fields) {
+                    $output = '<table style="border:1px solid #333; float: left; margin-right: 20px;">';
+                    $output .= '<thead><tr><td colspan="2" style="border:1px solid #333; text-align: center; text-transform:uppercase;">' . $this->Title . '</td></tr></thead>';
+                    $output .= '<tboby>';
+
+                    foreach ($fields as $field) {
+                        $output .= '<tr >';
+                        $output .= '<td style="padding: 5px; border-bottom: 1px solid #DDD">' . $field['name'] . '</td>';
+                        $output .= '<td style="padding: 5px; border-bottom: 1px solid #DDD">' . $field['fieldID'] . '</td>';
+                        $output .= '</tr>';
+                    }
+
+                    $output .= '</tbody>';
+                    $output .= '</table>';
+
+                    return $output;
+                }
+            }
+        } catch (Exception $e) {
+            return sprintf('Something went wrong: %s', $e->getMessage());
         }
 
-        if (!$this->APIKey) {
-            return sprintf("API Key is not set on Ubiquity database (%s)", $this->NiceTitle());
-        }
-
-        return true;
+        return 'No data available';
     }
 }

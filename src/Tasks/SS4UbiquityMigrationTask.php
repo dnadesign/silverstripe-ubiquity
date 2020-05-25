@@ -1,5 +1,13 @@
 <?php
 
+namespace Ubiquity\Tasks;
+
+use Exception;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\Queries\SQLUpdate;
+use Ubiquity\Models\UbiquityDatabase;
+
 class SS4UbiquityMigrationTask extends BuildTask
 {
     private static $segment = 'SS4UbiquityMigrationTask';
@@ -43,7 +51,7 @@ class SS4UbiquityMigrationTask extends BuildTask
                 $update->assign('"ClassName"', $qualifiedClassName);
                 $update->execute();
             } else {
-                $err = ($className === null)? "Null" : $className;
+                $err = ($className === null) ? "Null" : $className;
                 echo "Unable to find a mapping for " . $err . "\r\n";
             }
         }

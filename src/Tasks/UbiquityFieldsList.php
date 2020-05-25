@@ -1,5 +1,11 @@
 <?php
 
+namespace Ubiquity\Tasks;
+
+use SilverStripe\Dev\BuildTask;
+use Ubiquity\Models\UbiquityDatabase;
+use Ubiquity\Services\UbiquityService;
+
 class UbiquityFieldsList extends BuildTask
 {
     /**
@@ -13,31 +19,10 @@ class UbiquityFieldsList extends BuildTask
 
     public function run($request)
     {
-        $databases = UbiquityDatabase::get()->filter('Environment', Director::get_environment_type());
+        $databases = UbiquityDatabase::get();
 
         foreach ($databases as $database) {
-            $service = new UbiquityService($database);
-            $fields = $service->getUbiquityDatabaseFields();
-            $this->outputTable($database->Title, $fields);
+            echo $database->generateFieldsTable();
         };
-    }
-
-    public function outputTable($title, $fields)
-    {
-        $output = '<table style="border:1px solid #333; float: left; margin-right: 20px;">';
-        $output .= '<thead><tr><td colspan="2" style="border:1px solid #333; text-align: center; text-transform:uppercase;">' . $title . '</td></tr></thead>';
-        $output .= '<tboby>';
-
-        foreach ($fields as $field) {
-            $output .= '<tr >';
-            $output .= '<td style="padding: 5px; border-bottom: 1px solid #DDD">' . $field['name'] . '</td>';
-            $output .= '<td style="padding: 5px; border-bottom: 1px solid #DDD">' . $field['fieldID'] . '</td>';
-            $output .= '</tr>';
-        }
-
-        $output .= '</tbody>';
-        $output .= '</table>';
-
-        echo $output;
     }
 }

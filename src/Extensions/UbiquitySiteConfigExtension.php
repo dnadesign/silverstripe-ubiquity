@@ -1,7 +1,17 @@
 <?php
 
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataExtension;
+use Ubiquity\Models\UbiquityDatabase;
+
 /**
- * Add Ubiquity setup to Siteconfig
+ * Add Ubiquity setup to Site Config
  */
 class UbiquitySiteConfigExtension extends DataExtension
 {
@@ -12,7 +22,7 @@ class UbiquitySiteConfigExtension extends DataExtension
     ];
 
     private static $has_many = [
-        'UbiquityDatabases' => 'UbiquityDatabase'
+        'UbiquityDatabases' => UbiquityDatabase::class
     ];
 
     private static $defaults = [

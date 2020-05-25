@@ -1,5 +1,13 @@
 <?php
 
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataExtension;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+
 /**
  * Extension for EditableMultipleOptionField
  * Allows sending a different value to Ubiquity that the value of the option selected
@@ -9,7 +17,7 @@ class UbiquityMultipleOptionExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         $database = $this->owner->Parent()->UbiquityDatabase;
-        $options = $fields->fieldByName('Root.Options.Options');
+        $options = $fields->dataFieldByName('Options');
 
         if ($database && $database->exists() && $options) {
             $conf = $options->getConfig();
