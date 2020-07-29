@@ -74,33 +74,7 @@ class UbiquityUserFormControllerExtension extends Extension
             }
 
             // submit to ubiquity
-            $referenceID = $service->createOrUpdateContact($data);
-
-            // Once we sign up the user, we need to send them an email which is triggered
-            // by posting to a Ubiquity Form.
-            /**
-             * NOTE: this is wrong, the json will not be decoded properly by Ubiquity.
-             * The issue here is that we should post to the form first, rather than creating the contact directly in the DB.
-             */
-            // if (
-            //     $referenceID && $referenceID !== true
-            //     && $userForm->UbiquitySuccessFormEmailTriggerID
-            //     && $userForm->UbiquitySuccessFormID
-            //     && $userForm->UbiquitySuccessFormAction
-            // ) {
-            //     $data = [
-            //         'data' => [
-            //             [
-            //                 'fieldID' => $userForm->SignupUbiquitySuccessFormEmailTriggerID,
-            //                 'value'   => $userForm->SignupUbiquitySuccessFormAction
-            //             ]
-            //         ],
-            //         'referenceID' => $referenceID,
-            //         'source' => $userForm->UbiquitySubmitSource // form source is always a link to the form
-            //     ];
-
-            //     $emailSent = $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
-            // }
+            $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
         } catch (Exception $e) {
             $this->exitWithError($e);
             return false;
