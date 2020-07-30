@@ -210,6 +210,5 @@ class UbiquityUserFormControllerExtension extends Extension
         }
 
         SS_Log::log($e->getMessage(), SS_Log::WARN);
-        exit();
     }
 }
