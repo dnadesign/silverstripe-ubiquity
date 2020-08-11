@@ -160,7 +160,7 @@ class UbiquityUserFormControllerExtension extends Extension
         // as they can have their own UbiquityFieldID even if their parent doesn't.
         $options = EditableOption::get()
             ->filter('ParentID', $userForm->Fields()->column('ID'))
-            ->exclude('UbiquityFieldID', '');
+            ->exclude('UbiquityFieldID', ['', NULL]);
 
         if ($options) {
             foreach ($options as $option) {
