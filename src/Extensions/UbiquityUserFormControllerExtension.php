@@ -168,16 +168,7 @@ class UbiquityUserFormControllerExtension extends Extension
 
                 // Finds it's parent value
                 $parent = $option->Parent();
-                $selectedValue = (isset($data[$parent->Name])) ? $data[$parent->Name] : null;
-
-                // By default, set the value of a checkbox to null
-                // so it can be reset to default value on Ubiquity database
-                // If the box has been checked, it will be picked up
-                // by the next if
-                $fieldData = [
-                    'fieldID' => $option->UbiquityFieldID,
-                    'value' => ''
-                ];
+                $selectedValue = (isset($userFormData[$parent->Name])) ? $userFormData[$parent->Name] : null;
 
                 // This option has been selected
                 // Send it's value or overwritten value to Ubiquity
@@ -195,6 +186,7 @@ class UbiquityUserFormControllerExtension extends Extension
                             $optionValue = $option->Title;
                         }
 
+                        $fieldData['fieldID'] = $option->UbiquityFieldID;
                         $fieldData['value'] = $optionValue;
                     }
                 }
