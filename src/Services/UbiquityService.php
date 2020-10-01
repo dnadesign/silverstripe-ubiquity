@@ -263,6 +263,56 @@ class UbiquityService
     }
 
     /**
+     * @param $fields SS_List list of fields assigned an ubiquity ID
+     * @param $options SS_List list of EditableOption assigned an ubiquity ID
+     * @param $data Array submitted data (merged with source data)
+     */
+    public function createOrUpdateContact($data)
+    {
+        // Check if contact already exists given the email form field
+        $emailData = $this->getEmailData($data);
+
+        $contact = $this->getContact($emailData);
+
+        $uri = 'database/contacts';
+
+        if ($contact) {
+            // update an existing contact
+            $id = $contact['referenceID'];
+            $uri .= '/' . $id;
+            $data = $this->filterUpdateData($data, $contact);
+            $method = self::METHOD_PUT;
+        } else {
+            $method = self::METHOD_POST;
+        }
+
+        // If there is no data to update, exit here
+        if (empty($data)) {
+            return true;
+        }
+
+        $response = $this->call($method, $uri, null, $data);
+
+        if ($contact) {
+            if ($response->getStatusCode() !== 200) {
+                throw new Exception('An ubiquity API error occurred (update)');
+            }
+
+            $result = $this->decodeResponse($response);
+
+            // creating a new contact needs to return the referenceID
+            return $result['referenceID'];
+        } else {
+            if ($response->getStatusCode() !== 201) {
+                throw new Exception('An ubiquity API error occurred (create)');
+            }
+
+            // updating an existing contact needs to return true if successful
+            return true;
+        }
+    }
+
+    /**
      * Build query string in format readable by ubiquity
      *
      * @param array (Ubiquity field id => value)
