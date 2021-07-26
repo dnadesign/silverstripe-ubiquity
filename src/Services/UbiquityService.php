@@ -182,19 +182,19 @@ class UbiquityService
     /**
      * Retrieves an array of subscriber data for an existing contact if it exists
      *
-     * @param array The $emailData array should contain the fieldID of the email field (in the Ubiquity Database) and the value (an email address) of a subscriber
+     * @param array The $params array should contain the fieldID of the email field (in the Ubiquity Database) and the value (an email address) of a subscriber
      * @return array|false array of user data or false if it doesn't exist
      */
-    public function getContact($emailData)
+    public function getContact($params)
     {
         // check the function has been passed a fieldID
-        $fieldID = (isset($emailData['fieldID'])) ? $emailData['fieldID'] : null;
+        $fieldID = (isset($params['fieldID'])) ? $params['fieldID'] : null;
         if (!$fieldID) {
             throw new Exception('The fieldID of the email field is required.');
         }
 
         // get the email address submitted
-        $email = (isset($emailData['value'])) ? $emailData['value'] : null;
+        $email = (isset($params['value'])) ? $params['value'] : null;
 
         // check the email address is valid
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
@@ -202,7 +202,7 @@ class UbiquityService
         }
 
         $query = [
-            'filter' => $this->buildFilterQueryString(array($emailData))
+            'filter' => $this->buildFilterQueryString(array($params))
         ];
 
         $response = $this->call(self::METHOD_GET, 'database/contacts', $query);
