@@ -2,6 +2,11 @@
 
 namespace Ubiquity\Extensions;
 
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Extension;
+
+namespace Ubiquity\Extensions;
+
 use Exception;
 use Psr\Log\LoggerInterface;
 use SilverStripe\Control\Director;
@@ -106,7 +111,7 @@ class UbiquityUserFormControllerExtension extends Extension
             ->Fields()
             ->exclude('UbiquityFieldID', ['', NULL]);
 
-        // not all fields are set to update ubiquity
+        // not fields are set to update ubiquity
         if (empty($fields)) {
             return $data;
         }
@@ -212,5 +217,7 @@ class UbiquityUserFormControllerExtension extends Extension
         }
 
         Injector::inst()->get(LoggerInterface::class)->error($e->getMessage());
+        SS_Log::log($e->getMessage(), SS_Log::WARN);
+        exit();
     }
 }

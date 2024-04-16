@@ -41,13 +41,41 @@ class UbiquityFormExtension extends Extension
             ->setEmptyString('-- Select one --');
 
         // Ubiquity allows submitting data to a form as well, usually tied to the Ubiquity database
-        $formID = TextField::create('UbiquityFormID', 'Ubiquity Form ID')
-            ->setDescription('ID of the form used to send the data to.');
+        // By populating the Sucess Form ID, you can automatically trigger an email response to
+        // be sent to the user, as if the Form was submitted directly.
+        $formID = TextField::create('UbiquitySuccessFormID', 'Ubiquity Success Form ID')
+            ->setDescription('ID of the form that will be used to send confirmation email once the user has signed up.');
+
+        // To trigger emails of the form, you must define which field the form needs to have the email sent.
+        $formFieldID = TextField::create('UbiquitySuccessFormEmailTriggerID', 'Ubiquity Success Form Field ID')
+            ->setDescription('ID of the field that will be used to send the form action (ususally named EmailTrigger)');
+
+        // Ubiquity forms can send different emails, define the Action that will send the email
+        $formAction = TextField::create('UbiquitySuccessFormAction', 'Ubiquity Success Form Action')
+            ->setDescription('Name of the Email that should be sent.');
+
+        // Allows Ubiquity to track the soure of the submission, eg newsletter signup, event form, feedback form
+        // Define the FieldID of the Ubiquity Field
+        $sourceID = TextField::create('UbiquitySourceFieldID', 'Ubiquity Source Field ID')
+            ->setDescription('ID of the field that will be use as primary source for the user.');
+
+        // Define the Name of the source to populate the above field
+        $sourceName = TextField::create('UbiquitySourceName', 'Ubiquity Source Name')
+            ->setDescription('Reference of this form as source.');
+
+        // Submit the source even if  a T&C's field is included yet is not checked
+        $submitSource = CheckboxField::create('UbiquitySubmitSource', 'Submit Source')
+            ->setDescription('Submit the source data even if a T&C\'s field exists but is not ticked');
 
         $fields->addFieldsToTab('Root.Ubiquity', [
             $enabled,
             $database,
-            $formID
+            $formID,
+            $formFieldID,
+            $formAction,
+            $sourceID,
+            $sourceName,
+            $submitSource
         ]);
     }
 }

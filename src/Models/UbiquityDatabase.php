@@ -14,7 +14,7 @@ use Ubiquity\Services\UbiquityService;
  */
 class UbiquityDatabase extends DataObject
 {
-    private static $table_name = 'UbiquityDatabase';
+    private static $table_name = "UbiquityDatabase";
 
     private static $db = [
         'Title' => 'Varchar(255)',
