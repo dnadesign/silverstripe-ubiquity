@@ -1,10 +1,16 @@
 <?php
 
+namespace Ubiquity\Forms;
+
+use SilverStripe\UserForms\Model\EditableFormField\EditableCheckbox;
+
 /**
  * A generic Signup Field that allows the checkbox label to be long text that includes Links
  */
 class EditableSignupField extends EditableCheckbox
 {
+    private static $table_name = "UbiquityEditableSignupField";
+
     private static $singular_name = 'Sign up Field';
 
     private static $plural_name = 'Sign up Fields';

@@ -1,6 +1,9 @@
 <?php
+namespace Ubiquity\Services;
 
 use GuzzleHttp\Client;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\SiteConfig\SiteConfig;
 
 class UbiquityService
 {
@@ -44,7 +47,7 @@ class UbiquityService
     {
         return SiteConfig::current_site_config()->UbiquityEnabled;
     }
-    
+
     /**
      *  Return the Ref ID of the email field
      */
@@ -52,17 +55,17 @@ class UbiquityService
     {
         // TODO cache the fields
         $fields = $this->getUbiquityDatabaseFields();
-        
+
         if (!$fields || !is_array($fields)) {
             return false;
         }
-        
+
         $list = ArrayList::create($fields);
         $field = $list->filter([
             'type' => 'Email',
             'isNullable' => false
         ])->first();
-            
+
         if (!$field || empty($field) || !isset($field['fieldID'])) {
             return false;
         }
@@ -107,7 +110,7 @@ class UbiquityService
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('Could not decode Ubiquity response');
         }
-        
+
         if (!is_array($result)) {
             throw new Exception('Ubiquity response is not an array');
         }
@@ -139,7 +142,7 @@ class UbiquityService
                 'apiToken' => $this->database->APIKey
             ]
         ];
-        
+
         return $options;
     }
 
@@ -159,7 +162,7 @@ class UbiquityService
         }
 
         $options = $this->getDefaultOptions();
-       
+
         if ($query) {
             $options['query'] = array_merge($options['query'], $query);
         }
@@ -167,7 +170,7 @@ class UbiquityService
         if ($data) {
             $options['json'] = ['data' => $data];
         }
-       
+
         $client = new Client;
         $response = $client->request($method, $uri, $options);
 
@@ -184,7 +187,7 @@ class UbiquityService
     {
         // get the email address submitted
         $email = (isset($emailData['value'])) ? $emailData['value'] : null;
-        
+
         // check the email address is valid
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             throw new Exception('Email field value is not a valid email address');
@@ -193,7 +196,7 @@ class UbiquityService
         $query = [
             'filter' => $this->buildFilterQueryString(array($emailData))
         ];
-    
+
         //self::get()?
         $response = $this->call(self::METHOD_GET, 'database/contacts', $query);
 
@@ -202,7 +205,7 @@ class UbiquityService
         }
 
         $result = $this->decodeResponse($response);
-        
+
         if ($result && isset($result['totalReturned']) && $result['totalReturned'] > 0) {
             return $result['selectedContacts'][0];
         }
@@ -232,7 +235,7 @@ class UbiquityService
         if (!$emailData) {
             throw new Exception('No data fieldID mathcing Ubiquity email ID found');
         }
-    
+
         // validate email
         if (filter_var($emailData['value'], FILTER_VALIDATE_EMAIL) === false) {
             throw new Exception('Invalid email address for ubiquity');
@@ -250,11 +253,11 @@ class UbiquityService
     {
         // Check if contact already exists given the email form field
         $emailData = $this->getEmailData($data);
-        
+
         $contact = $this->getContact($emailData);
 
         $uri = 'database/contacts';
-        
+
         if ($contact) {
             // update an existing contact
             $id = $contact['referenceID'];
@@ -269,9 +272,9 @@ class UbiquityService
         if (empty($data)) {
             return true;
         }
-        
+
         $response = $this->call($method, $uri, null, $data);
-    
+
         if ($contact) {
             if ($response->getStatusCode() !== 200) {
                 throw new Exception('An ubiquity API error occured (update)');
@@ -358,7 +361,7 @@ class UbiquityService
             if (!empty($emptyRemoteField) && isset($row['value']) && !empty($row['value'])) {
                 return true;
             }
-            
+
             // Otherwise, if the remote field is not empty
             // make sure we can override it
             if (empty($emptyRemoteField)) {
@@ -396,7 +399,7 @@ class UbiquityService
         }
 
         $keys = Config::inst()->get('UbiquityService', 'analytics_keys');
-        
+
         if ($keys && is_array($keys)) {
             foreach ($keys as $key) {
                 array_push($analyticsKeys, ['Key' => $key]);

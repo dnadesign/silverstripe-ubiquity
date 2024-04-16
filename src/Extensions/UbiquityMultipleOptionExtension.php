@@ -1,4 +1,11 @@
 <?php
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataExtension;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 
 /**
  * Extension for EditableMultipleOptionField

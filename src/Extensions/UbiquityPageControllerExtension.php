@@ -1,4 +1,9 @@
 <?php
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Core\Extension;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\Requirements;
 
 /**
  * Register analytics for all Ubiqutiy analytics tracking keys

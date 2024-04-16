@@ -1,10 +1,19 @@
 <?php
+namespace Ubiquity\Models;
+
+use SilverStripe\Control\Director;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * Ubiquity Database model
  */
 class UbiquityDatabase extends DataObject
 {
+    private static $table_name = "UbiquityDatabase";
+
     private static $db = [
         'Environment' => 'Varchar(255)',
         'Title' => 'Varchar(255)',
@@ -12,7 +21,7 @@ class UbiquityDatabase extends DataObject
     ];
 
     private static $has_one = [
-        'SiteConfig' => 'SiteConfig',
+        'SiteConfig' => SiteConfig::class,
     ];
 
     private static $summary_fields = [

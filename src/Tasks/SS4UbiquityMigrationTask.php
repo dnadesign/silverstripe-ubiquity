@@ -1,4 +1,5 @@
 <?php
+use SilverStripe\Dev\BuildTask;
 
 class SS4UbiquityMigrationTask extends BuildTask
 {

@@ -1,4 +1,6 @@
 <?php
+use SilverStripe\Dev\BuildTask;
+use Ubiquity\Services\UbiquityService;
 
 class UbiquityFieldsList extends BuildTask
 {
