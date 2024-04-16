@@ -1,4 +1,8 @@
 <?php
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Extension;
 
 /**
  * Submit to ubiquity after a UDF submission
@@ -46,7 +50,7 @@ class UbiquityUserFormControllerExtension extends Extension
             // If this field is included in the form, the form processor will need to determine if the field is checked.
             // if not included in the form, data is sent to ubiquity (but only if there are ubiquity fields)
             $signupField = $userForm->Fields()->filter('ClassName', 'EditableSignupField')->first();
-            
+
             if ($signupField && $signupField->exists()) {
                 // if Checked, data will be submitted as normal (but only if there are ubiquity fields)
                 $checked = isset($data[$signupField->Name]) ? $data[$signupField->Name] : false;
@@ -70,7 +74,7 @@ class UbiquityUserFormControllerExtension extends Extension
             }
 
             $data = array_filter($data);
-        
+
             // submit to ubiquity
             $referenceID = $service->createOrUpdateContact($data);
 
@@ -87,7 +91,7 @@ class UbiquityUserFormControllerExtension extends Extension
                     'referenceID' => $referenceID,
                     'source' => $userForm->Link() // form source is always a link to the form
                 ];
-                
+
                 $emailSent = $service->triggerForm($userForm->UbiquitySuccessFormID, $data);
             }
         } catch (Exception $e) {
@@ -114,7 +118,7 @@ class UbiquityUserFormControllerExtension extends Extension
         $fields = $userForm
             ->Fields()
             ->exclude('UbiquityFieldID', '');
-        
+
         // not fields are set to update ubiquity
         if (empty($fields)) {
             return $data;
@@ -223,7 +227,7 @@ class UbiquityUserFormControllerExtension extends Extension
             echo $e->getMessage();
             exit();
         }
-        
+
         SS_Log::log($e->getMessage(), SS_Log::WARN);
         exit();
     }

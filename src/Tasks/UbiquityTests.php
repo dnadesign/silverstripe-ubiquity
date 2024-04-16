@@ -1,4 +1,7 @@
 <?php
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DataObject;
+use Ubiquity\Services\UbiquityService;
 
 class UbiquityTests extends BuildTask
 {
