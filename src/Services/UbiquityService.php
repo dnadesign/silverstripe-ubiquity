@@ -1,20 +1,14 @@
 <?php
-namespace Ubiquity\Services;
 
 namespace Ubiquity\Services;
 
 use Exception;
 use GuzzleHttp\Client;
-<<<<<<< HEAD
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\SiteConfig\SiteConfig;
 use Ubiquity\Models\UbiquityDatabase;
-=======
-use SilverStripe\Core\Config\Config;
-use SilverStripe\SiteConfig\SiteConfig;
->>>>>>> 9ffaf6d (SS5 upgrade)
 
 class UbiquityService
 {
@@ -171,11 +165,7 @@ class UbiquityService
 
         $options = $this->getDefaultOptions();
 
-<<<<<<< HEAD
         if ($query && is_array($query)) {
-=======
-        if ($query) {
->>>>>>> 9ffaf6d (SS5 upgrade)
             $options['query'] = array_merge($options['query'], $query);
         }
 
@@ -204,11 +194,7 @@ class UbiquityService
         }
 
         // get the email address submitted
-<<<<<<< HEAD
         $email = (isset($params['value'])) ? $params['value'] : null;
-=======
-        $email = (isset($emailData['value'])) ? $emailData['value'] : null;
->>>>>>> 9ffaf6d (SS5 upgrade)
 
         // check the email address is valid
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
@@ -219,10 +205,6 @@ class UbiquityService
             'filter' => $this->buildFilterQueryString(array($params))
         ];
 
-<<<<<<< HEAD
-=======
-        //self::get()?
->>>>>>> 9ffaf6d (SS5 upgrade)
         $response = $this->call(self::METHOD_GET, 'database/contacts', $query);
 
         if ($response->getStatusCode() !== 200) {
@@ -270,8 +252,6 @@ class UbiquityService
     }
 
     /**
-<<<<<<< HEAD
-=======
      * @param $fields SS_List list of fields assigned an ubiquity ID
      * @param $options SS_List list of EditableOption assigned an ubiquity ID
      * @param $data Array submitted data (merged with source data)
@@ -322,7 +302,6 @@ class UbiquityService
     }
 
     /**
->>>>>>> 9ffaf6d (SS5 upgrade)
      * Send data to a Ubiquity Form
      * Usually to trigger an email being sent from their end.
      */
@@ -404,8 +383,6 @@ class UbiquityService
 
         return array_values($updatedData);
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Determine if ubiquity analytis is enabled
@@ -438,5 +415,4 @@ class UbiquityService
 
         return $analyticsKeys;
     }
->>>>>>> 9ffaf6d (SS5 upgrade)
 }
