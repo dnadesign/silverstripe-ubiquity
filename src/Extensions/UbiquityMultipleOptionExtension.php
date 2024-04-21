@@ -1,5 +1,14 @@
 <?php
 
+namespace Ubiquity\Extensions;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataExtension;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
+
 /**
  * Extension for EditableMultipleOptionField
  * Allows sending a different value to Ubiquity that the value of the option selected
@@ -9,7 +18,7 @@ class UbiquityMultipleOptionExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         $database = $this->owner->Parent()->UbiquityDatabase;
-        $options = $fields->fieldByName('Root.Options.Options');
+        $options = $fields->dataFieldByName('Options');
 
         if ($database && $database->exists() && $options) {
             $conf = $options->getConfig();
@@ -27,6 +36,12 @@ class UbiquityMultipleOptionExtension extends DataExtension
                         return TextField::create($column);
                     }
                 ],
+                'Default' => [
+                    'title' => _t('EditableMultipleOptionField.DEFAULT', 'Selected by default?'),
+                    'callback' => function ($record, $column, $grid) {
+                        return CheckboxField::create($column);
+                    }
+                ],
                 'UbiquityFieldID' => [
                     'title' => 'Ubiquity Field ID',
                     'callback' => function ($record, $column, $grid) {
@@ -38,13 +53,7 @@ class UbiquityMultipleOptionExtension extends DataExtension
                     'callback' => function ($record, $column, $grid) {
                         return TextField::create($column);
                     }
-                ],
-                'Default' => [
-                    'title' => _t('EditableMultipleOptionField.DEFAULT', 'Selected by default?'),
-                    'callback' => function ($record, $column, $grid) {
-                        return CheckboxField::create($column);
-                    }
-                ],
+                ],                
                 'AllowOverride' => [
                     'title' => 'Allow Override Ubiquity DB',
                     'callback' => function ($record, $column, $grid) {
@@ -53,8 +62,8 @@ class UbiquityMultipleOptionExtension extends DataExtension
                 ]
             ]);
 
-            $conf->removeComponentsByType('GridFieldEditableColumns');
-            $conf->addComponent($editableColumns, 'GridFieldDeleteAction');
+            $conf->removeComponentsByType(GridFieldEditableColumns::class);
+            $conf->addComponent($editableColumns, GridFieldDeleteAction::class);
         }
 
         return $fields;

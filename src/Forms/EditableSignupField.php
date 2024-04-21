@@ -1,10 +1,20 @@
 <?php
 
+namespace Ubiquity\Forms\Fields;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\UserForms\Model\EditableFormField\EditableCheckbox;
+
 /**
  * A generic Signup Field that allows the checkbox label to be long text that includes Links
  */
 class EditableSignupField extends EditableCheckbox
 {
+    private static $table_name = 'EditableSignupField';
+
     private static $singular_name = 'Sign up Field';
 
     private static $plural_name = 'Sign up Fields';
@@ -18,23 +28,12 @@ class EditableSignupField extends EditableCheckbox
         'HTMLLabel' => 'HTMLText'
     ];
 
-    protected $htmlLabel;
-
-    /**
-     * @param
-     */
-    public function __construct($name = "", $title = "", $checked = null, $htmlLabel = null)
-    {
-        parent::__construct($name, $title, $checked);
-        $this->htmlLabel = $htmlLabel;
-    }
-
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function ($fields) {
             $fields->addFieldToTab(
                 'Root.Main',
-                HtmlEditorField::create('HTMLLabel', 'Label HTML')
+                HTMLEditorField::create('HTMLLabel', 'Label HTML')
                     ->setRows(3)
                     ->setDescription('Note all HTML except links will be stripped out'),
                 'RightTitle'
@@ -46,13 +45,12 @@ class EditableSignupField extends EditableCheckbox
 
     /**
      * For the front end, return an UbiquityTermsAndConditionsField instead of a simple checkbox
-     * Alows us to have a specific template and reuse the UbiquityTermsAndConditionsField elsewhere
+     * Allows us to have a specific template and reuse the UbiquityTermsAndConditionsField elsewhere
      */
     public function getFormField()
     {
-        $field = EditableSignupField::create($this->Name, $this->EscapedTitle, $this->CheckedDefault, $this->HTMLLabel)
-            ->setFieldHolderTemplate('EditableSignupField_holder')
-            ->setTemplate('EditableSignupField')
+        $field = parent::getFormField()
+            ->setTitle($this->getTitleForTemplate())
             ->addExtraClass('ubiquitysignup');
 
         $this->doUpdateFormField($field);
@@ -66,8 +64,18 @@ class EditableSignupField extends EditableCheckbox
      *
      * @return DBField
      */
-    public function getHTMLLabel()
+    public function getHTMLLabelForTemplate()
     {
-        return DBField::create_field('HTMLText', strip_tags($this->htmlLabel, '<a>'))->forTemplate();
+        return DBField::create_field(DBHTMLText::class, strip_tags($this->HTMLLabel, '<a>'));
+    }
+
+    /**
+     * Returns the field label - used by templates.
+     *
+     * @return string
+     */
+    public function getTitleForTemplate()
+    {
+        return ($this->HTMLLabel) ? $this->getHTMLLabelForTemplate() : $this->Title;
     }
 }

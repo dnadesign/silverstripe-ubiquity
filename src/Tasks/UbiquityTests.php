@@ -1,5 +1,12 @@
 <?php
 
+namespace Ubiquity\Tasks;
+
+use Exception;
+use SilverStripe\Dev\BuildTask;
+use Ubiquity\Models\UbiquityDatabase;
+use Ubiquity\Services\UbiquityService;
+
 class UbiquityTests extends BuildTask
 {
     private static $segment = 'UbiquityTests';
@@ -10,15 +17,16 @@ class UbiquityTests extends BuildTask
 
     public function run($request)
     {
-        $service = new UbiquityService();
-        $databaseId = DataObject::get_one('UbiquityDatabase')->ID;
-
-        $service->setTargetDatabase($databaseId);
+        $database = UbiquityDatabase::get()->first();
+        if ($database) {
+            $service = new UbiquityService($database);
+        }
 
         try {
-            $service->getEmailFieldRefID();
-        } catch (Error $e) {
+            echo sprintf('Ubiquity Email Field ID for database %s: %s', $database->Title, $service->getUbiquityEmailFieldID());
+        } catch (Exception $e) {
             var_dump($e->getMessage());
+            exit();
         }
     }
 }

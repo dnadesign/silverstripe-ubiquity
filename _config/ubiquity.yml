@@ -2,24 +2,24 @@
 Name: ubiquityconfig
 ---
 
-SiteConfig:
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - UbiquitySiteConfigExtension
-UserDefinedForm:
+    - Ubiquity\Extensions\UbiquitySiteConfigExtension
+SilverStripe\UserForms\Model\UserDefinedForm:
   extensions:
-    - UbiquityFormExtension
-SubmittedForm:
+    - Ubiquity\Extensions\UbiquityFormExtension
+SilverStripe\UserForms\Model\Submission\SubmittedForm:
   extensions:
-    - UbiquityUserFormControllerExtension
-EditableFormField:
+    - Ubiquity\Extensions\UbiquityUserFormControllerExtension
+SilverStripe\UserForms\Model\EditableFormField:
   extensions:
-    - UbiquityEditableFormFieldExtension
-EditableOption:
+    - Ubiquity\Extensions\UbiquityEditableFormFieldExtension
+SilverStripe\UserForms\Model\EditableFormField\EditableOption:
   extensions:
-    - UbiquityEditableOptionExtension
-EditableMultipleOptionField:
+    - Ubiquity\Extensions\UbiquityEditableOptionExtension
+SilverStripe\UserForms\Model\EditableFormField\EditableMultipleOptionField:
   extensions:
-    - UbiquityMultipleOptionExtension
-Page_Controller:
+    - Ubiquity\Extensions\UbiquityMultipleOptionExtension
+PageController:
   extensions:
-    - UbiquityPageControllerExtension
+    - Ubiquity\Extensions\UbiquityPageControllerExtension
