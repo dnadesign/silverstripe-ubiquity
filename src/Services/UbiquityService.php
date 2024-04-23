@@ -252,6 +252,56 @@ class UbiquityService
     }
 
     /**
+     * @param $fields SS_List list of fields assigned an ubiquity ID
+     * @param $options SS_List list of EditableOption assigned an ubiquity ID
+     * @param $data Array submitted data (merged with source data)
+     */
+    public function createOrUpdateContact($data)
+    {
+        // Check if contact already exists given the email form field
+        $emailData = $this->getEmailData($data);
+
+        $contact = $this->getContact($emailData);
+
+        $uri = 'database/contacts';
+
+        if ($contact) {
+            // update an existing contact
+            $id = $contact['referenceID'];
+            $uri .= '/' . $id;
+            $data = $this->filterUpdateData($data, $contact);
+            $method = self::METHOD_PUT;
+        } else {
+            $method = self::METHOD_POST;
+        }
+
+        // If there is no data to update, exit here
+        if (empty($data)) {
+            return true;
+        }
+
+        $response = $this->call($method, $uri, null, $data);
+
+        if ($contact) {
+            if ($response->getStatusCode() !== 200) {
+                throw new Exception('An ubiquity API error occured (update)');
+            }
+
+            $result = $this->decodeResponse($response);
+
+            // creating a new contect needs to return the referenceID
+            return $result['referenceID'];
+        } else {
+            if ($response->getStatusCode() !== 201) {
+                throw new Exception('An ubiquity API error occured (c)reate');
+            }
+
+            // updating an existing contact needs to return true if successful
+            return true;
+        }
+    }
+
+    /**
      * Send data to a Ubiquity Form
      * Usually to trigger an email being sent from their end.
      */
@@ -332,5 +382,37 @@ class UbiquityService
         });
 
         return array_values($updatedData);
+    }
+
+    /**
+     * Determine if ubiquity analytis is enabled
+     *
+     * @return boolean
+     */
+    public static function get_ubiquity_analytics_enabled()
+    {
+        return SiteConfig::current_site_config()->UbiquityAnalyticsEnabled;
+    }
+
+    /**
+     * Helper to get the Analytics keys
+     */
+    public static function get_analytics_keys()
+    {
+        $analyticsKeys = [];
+
+        if (!self::get_ubiquity_analytics_enabled()) {
+            return $analyticsKeys;
+        }
+
+        $keys = Config::inst()->get('UbiquityService', 'analytics_keys');
+
+        if ($keys && is_array($keys)) {
+            foreach ($keys as $key) {
+                array_push($analyticsKeys, ['Key' => $key]);
+            }
+        }
+
+        return $analyticsKeys;
     }
 }

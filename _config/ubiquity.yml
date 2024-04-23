@@ -1,7 +1,6 @@
 ---
 Name: ubiquityconfig
 ---
-
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Ubiquity\Extensions\UbiquitySiteConfigExtension
