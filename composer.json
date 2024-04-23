@@ -1,7 +1,7 @@
 {
   "name": "dnadesign/silverstripe-ubiquity",
   "description": "Implements Ubiquity extensions for User Defined Forms",
-  "type": "silverstripe-module",
+  "type": "silverstripe-vendormodule",
   "keywords": [
     "silverstripe",
     "ubiquity",
